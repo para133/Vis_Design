@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # 初始化数据库
 db.init_app(app)
-# 测试
+
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
 def upload():
