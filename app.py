@@ -13,8 +13,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-
-
 @app.route('/')
 def index():
     if 'user_id' not in session:
@@ -49,6 +47,10 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)  # 清除登录状态
+    return redirect(url_for('login'))  # 跳转回登录页
 
 if __name__ == '__main__':
     app.run(debug=True)
