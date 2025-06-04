@@ -9,14 +9,14 @@
 文件解析：针对微信/支付宝账单的 CSV/XLS 文件解析
 
 ### stucture may be like:
-bill-analyzer/
-├── app.py
-├── requirements.txt
-├── static/
-│   └── js/
-├── templates/
-│   └── index.html
-├── uploads/
-│   └── (账单文件上传目录)
-├── models.py
-├── utils.py
+Vis_Design/
+    ├── app.py
+    ├── requirements.txt
+    ├── static/
+    │   └── js/
+    ├── templates/
+    │   └── index.html
+    ├── uploads/
+    │   └── (账单文件上传目录)
+    ├── models.py
+    ├── utils.py
