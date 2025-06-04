@@ -1,6 +1,6 @@
 # A bill analyzer
 
-
+（python = 3.11.0）
 ### you might need:
 后端：Flask（Python Web 框架）
 前端：Bootstrap（页面样式）、ECharts/Chart.js（可视化图表）
