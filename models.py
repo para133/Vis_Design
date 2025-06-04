@@ -28,14 +28,16 @@ class Bill(db.Model):
         return f'<Bill {self.platform} {self.id}: {self.transaction_time} - {self.amount}>'
     
     
+# 存储在 data/visData.db 的用户表
 class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    # 一对多关系：一个用户可以有多条账单
     bills = db.relationship('Bill', backref='user', lazy=True)
     
     def __repr__(self):
         return f'<User {self.username}>'
-
+    
