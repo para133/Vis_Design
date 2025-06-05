@@ -1,6 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
 import os
+
+from flask_sqlalchemy import SQLAlchemy
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'data', 'visData.db')
@@ -12,7 +12,7 @@ class Bill(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 外键关联到用户表
     platform = db.Column(db.String, nullable=False)             # 'wechat' 或 'alipay'
-    transaction_time = db.Column(db.String, nullable=False)     # 交易时间
+    transaction_time = db.Column(db.DateTime, nullable=False)     # 交易时间
     category = db.Column(db.String, nullable=True)              # 支付宝: 交易分类，微信: 交易类型
     counterparty = db.Column(db.String, nullable=True)          # 对方名称
     product = db.Column(db.String, nullable=True)               # 产品或服务名称
@@ -25,7 +25,7 @@ class Bill(db.Model):
     remarks = db.Column(db.String, nullable=True)               # 备注
 
     def __repr__(self):
-        return f'<Bill {self.platform} {self.id}: {self.transaction_time} - {self.amount}>'
+        return f'<Bill {self.user_id} {self.platform} {self.id}: {self.transaction_time} - {self.amount}>'
     
     
 # 存储在 data/visData.db 的用户表
@@ -40,4 +40,5 @@ class User(db.Model):
     
     def __repr__(self):
         return f'<User {self.username}>'
+        
     

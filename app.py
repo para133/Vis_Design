@@ -1,9 +1,10 @@
 import os
+from datetime import datetime
 
 from flask import Flask, request, jsonify,render_template,redirect, url_for,session
 
-from models import db, User, Bill
-
+from models.data import db
+from models.db import BillDataBase
 
 app = Flask(__name__)
 
@@ -18,6 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # 初始化数据库
 db.init_app(app)
+billdatabase = BillDataBase(app, db)
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
@@ -38,9 +40,11 @@ def upload():
         file_path = os.path.join(BASE_DIR, 'uploads', file.filename)
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         file.save(file_path)
+        billdatabase.save_bill(file_path, session['user_id'])
+        start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
+        end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
+        res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
         
-        # TODO 
-        # 这里可以添加文件处理逻辑，比如解析文件内容，存储到数据库等
 
         return render_template('index.html', message='文件上传成功', message_type='success')
     return render_template('index.html', message='文件上传失败', message_type='error')
@@ -51,9 +55,13 @@ def index():
     # 检查用户是否已登录
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    user = User.query.get(session['user_id'])
-    # 如果已登录，渲染主页
-    return render_template('index.html', username=user.username)
+    user = billdatabase.get_user(session['user_id'])
+    if user:
+        # 如果已登录，渲染主页
+        return render_template('index.html', username=user.username)
+    else:
+        # 如果用户不存在，重定向到登录页
+        return redirect(url_for('login'))
 
 # 用户登录路由
 @app.route('/login', methods=['GET', 'POST'])
@@ -62,7 +70,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
         # 提取用户名
-        user = User.query.filter_by(username=username).first()
+        user = billdatabase.get_user(username)
         if user:
            # 如果该用户名存在，则检查密码 
             if user.password == password:
@@ -73,13 +81,11 @@ def login():
                 return render_template('login.html', message="密码错误，请重试", username=username)
         else:
             # 如果用户不存在，则添加新用户
+            user = billdatabase.add_user(username, password)
             if not user:
-                # User是一张用户表，包含用户名和密码，new_user是新建的用户对象
-                new_user = User(username=username, password=password)
-                db.session.add(new_user)
-                db.session.commit()
-                user = new_user
-                # 提示：新用户已创建
+                # 用户已存在提示
+                return render_template('login.html', message="用户名已存在，请选择其他用户名", username=username)
+            else:
                 session['user_id'] = user.id
                 return render_template('login.html', message=f"新用户 {username} 已创建，请重新登录")
             

@@ -26,13 +26,15 @@ VisDesign/
     │   └── js/
     ├── templates/
     │   └── index.html
+    ├── models\
+    │    └── data.py // 数据库模型数据结果
+    │    └── db.py // 数据库操作类
     ├── uploads/
     │   └── (账单文件上传目录)
     ├── app.py
     ├── requirements.txt
     ├── data/
-    │   ├── visData.db (数据库文件)
-    ├── models.py  
+    │   ├── visData.db // 数据库文件
     ├── utils.py
 ```
 
