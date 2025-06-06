@@ -41,9 +41,9 @@ def upload():
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         file.save(file_path)
         billdatabase.save_bill(file_path, session['user_id'])
-        start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
-        end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
-        res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
+        # start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
+        # end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
+        # res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
         
 
         return render_template('index.html', message='文件上传成功', message_type='success')
