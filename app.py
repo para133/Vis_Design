@@ -21,11 +21,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 billdatabase = BillDataBase(app, db)
 
-
-
-
-
-
 # 账单明细
 @app.route('/details', methods=['GET'])
 def details():
