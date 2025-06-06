@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 
 from flask import Flask, request, jsonify, render_template,redirect, url_for,session
+from pyecharts.charts import Bar
+from pyecharts import options as opts
 
 from models.data import db
 from models.db import BillDataBase
@@ -28,18 +30,20 @@ def get_pie_data():
     user_id = session.get('user_id')
     data = billdatabase.get_expend_classification_pie_data(user_id)
     return data
+
+def get_bar_data():
+    """
+    获取用户的支出分类柱状图数据
+    """
+    data = billdatabase.get_last_week_expend_bar_data(session['user_id'])
+    return data
+
 def get_username():
     """
     获取当前登录用户的用户名
     """
     user = billdatabase.get_user(session['user_id'])
     return user.username if user else ""
-
-
-
-
-
-
 
 # 首页路由
 @app.route('/')
@@ -55,10 +59,11 @@ def index():
         # 如果已登录，渲染主页
         # TODO 首页dashboard渲染
         pie_data = get_pie_data()
-        print(pie_data)
+        bar_data = get_bar_data()
+        print(bar_data)
         #
         return render_template('index.html', username=user.username,
-                               pie_data=pie_data)
+                               pie_data=pie_data, bar_data=bar_data)
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
@@ -83,9 +88,7 @@ def upload():
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             file.save(file_path)
             billdatabase.save_bill(file_path, session['user_id'])
-            start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
-            end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
-            res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
+
     return render_template('index.html', username=get_username(),message=message, message_type=message_type,
                            pie_data=get_pie_data())
 
@@ -109,7 +112,7 @@ def details():
     next_page = page + 1 if page * per_page < len(all_index) else None
 
     return render_template('details.html',data=data,index_list=index_list,total=total,
-                           page=page,prev_page=prev_page,next_page=next_page,username=user.username)
+                           page=page,prev_page=prev_page,next_page=next_page,username=user.username, start_date=start_date, end_date=end_date)
     
 
 # 用户登录路由
