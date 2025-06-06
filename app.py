@@ -44,6 +44,27 @@ def get_username():
     user = billdatabase.get_user(session['user_id'])
     return user.username if user else ""
 
+# 缓存用户数据 （登录成功后与上传文件后需要刷新)
+def refresh_user_data(user_id):
+    # 查询数据库
+    total_expend = billdatabase.get_total_expend(user_id)
+    total_income = billdatabase.get_total_income(user_id)
+    m_expend = billdatabase.get_highest_expend(user_id)
+    m_income = billdatabase.get_highest_income(user_id)
+    pie_data = billdatabase.get_expend_classification_pie_data(user_id)
+    # 存到 session
+    session['total_expend'] = total_expend
+    session['total_income'] = total_income
+    session['m_expend'] = m_expend
+    session['m_income'] = m_income
+    session['expend_percent'] = 0
+    session['income_percent'] = 0
+    if float(total_expend) != 0:
+        session['expend_percent'] = float(m_expend) / float(total_expend) * 100
+    if float(total_income) != 0:
+        session['income_percent'] = float(m_income) / float(total_income) * 100
+    session['pie_data'] = pie_data
+    
 # 首页路由
 @app.route('/')
 def index():
