@@ -49,6 +49,12 @@ def refresh_user_data(user_id):
     session['total_income'] = total_income
     session['m_expend'] = m_expend
     session['m_income'] = m_income
+    session['expend_percent'] = 0
+    session['income_percent'] = 0
+    if float(total_expend) != 0:
+        session['expend_percent'] = float(m_expend) / float(total_expend) * 100
+    if float(total_income) != 0:
+        session['income_percent'] = float(m_income) / float(total_income) * 100
     session['pie_data'] = pie_data
 
 
@@ -66,15 +72,14 @@ def index():
     else:
         # 如果已登录，渲染主页
         # TODO 首页dashboard渲染
-
-
         
-        return render_template('index.html',
-            username=get_username(),
+        return render_template('index.html',username=get_username(),
             total_expend=session.get('total_expend', 0),
             total_income=session.get('total_income', 0),
             m_expend=session.get('m_expend', 0),
             m_income=session.get('m_income', 0),
+            expend_percent=session.get('expend_percent', 0),
+            income_percent=session.get('income_percent', 0),
             pie_data=session.get('pie_data', [])
         )
 
@@ -106,12 +111,13 @@ def upload():
             # 刷新数据
             refresh_user_data(session['user_id'])
             
-    return render_template('index.html',message=message, message_type=message_type,
-        username=get_username(),
+    return render_template('index.html',message=message, message_type=message_type,username=get_username(),
         total_expend=session.get('total_expend', 0),
         total_income=session.get('total_income', 0),
         m_expend=session.get('m_expend', 0),
         m_income=session.get('m_income', 0),
+        expend_percent=session.get('expend_percent', 0),
+        income_percent=session.get('income_percent', 0),
         pie_data=session.get('pie_data', [])
     )
 
