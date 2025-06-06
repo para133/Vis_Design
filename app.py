@@ -21,6 +21,30 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 billdatabase = BillDataBase(app, db)
 
+
+
+# 账单明细
+@app.route('/details', methods=['GET'])
+def details():
+    user = billdatabase.get_user(session['user_id'])
+    start_date = request.args.get('start_date', None)
+    end_date = request.args.get('end_date', None)
+    start_date = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
+    end_date = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
+    data = billdatabase.get_bill_table_data(user.id,start_date=start_date, end_date=end_date)
+    page = int(request.args.get('page', 1))
+    all_index = list(data.keys())
+    total = len(all_index)
+    per_page = 20
+    # 分页
+    index_list = all_index[(page - 1) * per_page: page * per_page]
+    prev_page = page - 1 if page > 1 else None
+    next_page = page + 1 if page * per_page < len(all_index) else None
+
+    return render_template('details.html',data=data,index_list=index_list,total=total,
+                           page=page,prev_page=prev_page,next_page=next_page,username=user.username)
+
+
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
 def upload():
