@@ -7,11 +7,10 @@ from models.data import db
 from models.db import BillDataBase
 
 app = Flask(__name__)
+app.secret_key = 'b3f8e7c4a1d2e9f0b6c7d8e9f1a2b3c4d5e6f7a8b9c0d1e2'  
 
-app.secret_key = 'your_secret_key'  
-
+# 数据库配置
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# 建立数据库路径，确保目录存在
 DB_PATH = os.path.join(BASE_DIR, 'data', 'visData.db')
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 # 配置数据库连接
@@ -21,20 +20,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 billdatabase = BillDataBase(app, db)
 
-def get_pie_data():
-    """
-    获取用户的支出分类饼图数据
-    """
-    user_id = session.get('user_id')
-    data = billdatabase.get_expend_classification_pie_data(user_id)
-    return data
+
+
 def get_username():
     """
     获取当前登录用户的用户名
     """
     user = billdatabase.get_user(session['user_id'])
     return user.username if user else ""
-
 
 # 缓存用户数据 （登录成功后与上传文件后需要刷新)
 def refresh_user_data(user_id):
@@ -43,7 +36,7 @@ def refresh_user_data(user_id):
     total_income = billdatabase.get_total_income(user_id)
     m_expend = billdatabase.get_highest_expend(user_id)
     m_income = billdatabase.get_highest_income(user_id)
-    pie_data = get_pie_data()
+    pie_data = billdatabase.get_expend_classification_pie_data(user_id)
     # 存到 session
     session['total_expend'] = total_expend
     session['total_income'] = total_income
@@ -58,6 +51,8 @@ def refresh_user_data(user_id):
     session['pie_data'] = pie_data
 
 
+# 路由设置
+##########################################################################################################
 
 # 首页路由
 @app.route('/')
@@ -122,7 +117,6 @@ def upload():
     )
 
 
-
 # 账单明细
 @app.route('/details', methods=['GET'])
 def details():
@@ -178,6 +172,7 @@ def login():
 def logout():
     session.pop('user_id', None)  # 清除登录状态
     return redirect(url_for('login'))  # 跳转回登录页
+
 
 if __name__ == '__main__':
     app.run(debug=True)
