@@ -22,8 +22,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 billdatabase = BillDataBase(app, db)
 
-
-
 def get_username():
     """
     获取当前登录用户的用户名
@@ -39,6 +37,9 @@ def refresh_user_data(user_id):
     m_expend = billdatabase.get_highest_expend(user_id)
     m_income = billdatabase.get_highest_income(user_id)
     pie_data = billdatabase.get_expend_classification_pie_data(user_id)
+    highest_lowest_expend = billdatabase.get_highest_lowest_week_expend_income(user_id)
+    top10_expend = billdatabase.get_top10_expend_bill(user_id)
+    print(top10_expend)
     # 存到 session
     session['total_expend'] = total_expend
     session['total_income'] = total_income
@@ -52,6 +53,8 @@ def refresh_user_data(user_id):
         session['income_percent'] = float(m_income) / float(total_income) * 100
     session['pie_data'] = pie_data
     session['bar_data'] = billdatabase.get_last_week_expend_bar_data(user_id)
+    session['highest_lowest_expend'] = highest_lowest_expend
+    session['top10_expend'] = top10_expend
     
     
     
@@ -77,7 +80,9 @@ def index():
                                  expend_percent=session.get('expend_percent', 0),
                                  income_percent=session.get('income_percent', 0),
                                  pie_data=session.get('pie_data', []),
-                                 bar_data=session.get('bar_data', []))
+                                 bar_data=session.get('bar_data', []),
+                                 highest_lowest_expend=session.get('highest_lowest_expend', {}),
+                                 top10_expend=session.get('top10_expend', []))
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
@@ -113,7 +118,9 @@ def upload():
                             expend_percent=session.get('expend_percent', 0),
                             income_percent=session.get('income_percent', 0),
                             pie_data=session.get('pie_data', []),
-                            bar_data=session.get('bar_data', []))
+                            bar_data=session.get('bar_data', {}),
+                            highest_lowest_expend=session.get('highest_lowest_expend', {}),
+                            top10_expend=session.get('top10_expend', []))
 
 # 账单明细
 @app.route('/details', methods=['GET'])

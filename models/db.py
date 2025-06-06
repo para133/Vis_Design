@@ -319,5 +319,63 @@ class BillDataBase:
         
         total = query.with_entities(func.sum(Bill.amount)).scalar() or 0
         return f"{total:.3f}"
-                
+    
+    def get_highest_lowest_week_expend_income(self, user_id):
+        """
+        获取周支出综合最高的一周和最低的一周
+        """     
+        # 查询所有支出账单
+        bills = self.get_bills(user_id)
+        expend_bills = [bill for bill in bills if hasattr(bill, "income_or_expense") and bill.income_or_expense == "支出"]
+        if not expend_bills:
+            week_days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+            empty = {d: 0.0 for d in week_days}
+            return {
+                "highest": {"week_start": "", "days": empty.copy()},
+                "lowest": {"week_start": "", "days": empty.copy()}
+            }
+
+        # 按自然周分组
+        week_map = {}
+        week_days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+        for bill in expend_bills:
+            dt = bill.transaction_time
+            # 找到该账单所在周的周一日期
+            monday = dt - timedelta(days=dt.weekday())
+            week_start_str = monday.strftime("%Y-%m-%d")
+            if week_start_str not in week_map:
+                week_map[week_start_str] = {d: 0.0 for d in week_days}
+            week_map[week_start_str][week_days[dt.weekday()]] += bill.amount
+
+        # 计算每周总额
+        week_sums = {k: sum(v.values()) for k, v in week_map.items()}
+        if not week_sums:
+            empty = {d: 0.0 for d in week_days}
+            return {
+                "highest": {"week_start": "", "days": empty.copy()},
+                "lowest": {"week_start": "", "days": empty.copy()}
+            }
+        # 找到最大和最小周
+        highest_week = max(week_sums, key=week_sums.get)
+        lowest_week = min(week_sums, key=week_sums.get)
+        return {
+            "highest": {"week_start": highest_week, "days": week_map[highest_week]},
+            "lowest": {"week_start": lowest_week, "days": week_map[lowest_week]}
+        }
         
+    def get_top10_expend_bill(self, user_id):
+        """
+        获取支出金额前10的账单
+        """
+        bills = Bill.query.filter_by(user_id=user_id, income_or_expense='支出').order_by(Bill.amount.desc()).limit(10).all()
+        top10 = []
+        for bill in bills:
+            top10.append({
+                "序号": len(top10) + 1,
+                "商品名称": bill.product or "",
+                "交易金额": f"{bill.amount:.3f}",
+                "交易时间": bill.transaction_time.strftime("%Y-%m-%d %H:%M:%S") if bill.transaction_time else "",
+                "交易状态": bill.current_status or "",
+                "支付方式": bill.payment_method or "",              
+            })
+        return top10
