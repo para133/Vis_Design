@@ -23,6 +23,9 @@ billdatabase = BillDataBase(app, db)
 
 
 
+
+
+
 # 账单明细
 @app.route('/details', methods=['GET'])
 def details():
@@ -80,12 +83,18 @@ def index():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     user = billdatabase.get_user(session['user_id'])
-    if user:
-        # 如果已登录，渲染主页
-        return render_template('index.html', username=user.username)
-    else:
+    if not user:
         # 如果用户不存在，重定向到登录页
         return redirect(url_for('login'))
+    else:
+        # 如果已登录，渲染主页
+        # TODO 首页dashboard渲染
+        #
+        #
+        return render_template('index.html', username=user.username)
+
+
+    
 
 # 用户登录路由
 @app.route('/login', methods=['GET', 'POST'])
