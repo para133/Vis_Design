@@ -28,7 +28,7 @@
                                     </div>
 
                                     <div class="widget-detail-1" style="float: right;">
-                                        <h2 class="p-t-10 m-b-0"> {{ zcyl_zzc }} </h2>
+                                        <h2 class="p-t-10 m-b-0"> {{ total_expend }} </h2>
                                         <p class="text-muted">总支出金额</p>
                                     </div>
                                 </div>
@@ -41,11 +41,12 @@
 								<div class="widget-box-2">
                                     <div class="widget-detail-2">
                                         <span class="badge  pull-left m-t-20  am-round" style="color: #fff; background: #0e90d2;">{{ zcyl_dbzgzcbfb }} <i class="zmdi zmdi-trending-up"></i> </span>
-                                        <h2 class="m-b-0"> {{ zcyl_dbzgzc }} </h2>
+                                        <h2 class="m-b-0"> {{ m_expend }} </h2>
 
                                     </div>
                                     <div class="am-progress am-progress-xs am-margin-bottom-0">
-									    <div class="am-progress-bar" style="width: {{ zcyl_dbzgzcbfb }}"></div>
+                                        <!-- {{ expend_percent }} -->
+									    <div class="am-progress-bar" style="width: {{ expend_percent }}%"></div>
 									</div>
                                 </div>
 							</div>
@@ -59,7 +60,7 @@
                                     </div>
 
                                     <div class="widget-detail-1" style="float: right;">
-                                        <h2 class="p-t-10 m-b-0"> {{ zcyl_zsr }} </h2>
+                                        <h2 class="p-t-10 m-b-0"> {{ total_income }} </h2>
                                         <p class="text-muted">总收入金额</p>
                                     </div>
                                 </div>
@@ -72,11 +73,11 @@
 								<div class="widget-box-2">
                                     <div class="widget-detail-2">
                                         <span class="badge  pull-left m-t-20  am-round progress-bar-pink" style="color: #fff;">{{ zcyl_dbzgsrbfb }} <i class="zmdi zmdi-trending-up"></i> </span>
-                                        <h2 class="m-b-0"> {{ zcyl_dbzgsr }} </h2>
+                                        <h2 class="m-b-0"> {{ m_income }} </h2>
 
                                     </div>
                                     <div class="am-progress am-progress-xs am-margin-bottom-0" style="background: rgba(255, 138, 204, 0.2);">
-									    <div class="am-progress-bar progress-bar-pink" style="width: {{ zcyl_dbzgsrbfb }}"></div>
+									    <div class="am-progress-bar progress-bar-pink" style="width: {{ income_percent }}%"></div>
 									</div>
                                 </div>
 							</div>

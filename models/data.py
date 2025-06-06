@@ -1,6 +1,6 @@
 import os
-
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Index
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'data', 'visData.db')
@@ -24,6 +24,11 @@ class Bill(db.Model):
     merchant_id = db.Column(db.String, nullable=True)           # 商户号
     remarks = db.Column(db.String, nullable=True)               # 备注
 
+    # 加索引
+    __table_args__ = (
+        Index('idx_user_income_time', 'user_id', 'income_or_expense', 'transaction_time'),
+        Index('idx_user_category', 'user_id', 'category'),
+    )
     def __repr__(self):
         return f'<Bill {self.user_id} {self.platform} {self.id}: {self.transaction_time} - {self.amount}>'
     

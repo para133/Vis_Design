@@ -9,11 +9,10 @@ from models.data import db
 from models.db import BillDataBase
 
 app = Flask(__name__)
+app.secret_key = 'b3f8e7c4a1d2e9f0b6c7d8e9f1a2b3c4d5e6f7a8b9c0d1e2'  
 
-app.secret_key = 'your_secret_key'  
-
+# 数据库配置
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# 建立数据库路径，确保目录存在
 DB_PATH = os.path.join(BASE_DIR, 'data', 'visData.db')
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 # 配置数据库连接
@@ -69,15 +68,16 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload():
     message = '文件上传成功'
+    message_type = 'success'
     if 'file' not in request.files:
         message = '请求中没有文件部分'
     file = request.files['file']
     if file.filename == '':
         message = '没有选择文件'
-
     # 检查文件类型
     if not file.filename.endswith('.csv'):
         message = '只支持上传CSV文件'
+        
     if file:
         if message != '文件上传成功':
             message_type = 'error'
@@ -127,6 +127,7 @@ def login():
            # 如果该用户名存在，则检查密码 
             if user.password == password:
                 session['user_id'] = user.id
+                refresh_user_data(user.id)  # 刷新用户数据
                 return redirect(url_for('index'))
             else:
                 # 密码错误提示
@@ -147,6 +148,7 @@ def login():
 def logout():
     session.pop('user_id', None)  # 清除登录状态
     return redirect(url_for('login'))  # 跳转回登录页
+
 
 if __name__ == '__main__':
     app.run(debug=True)
