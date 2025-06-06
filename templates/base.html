@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="Access-Control-Allow-Origin" content="*">
 		<title>支出预览</title>
+		<link rel="stylesheet" href="../static/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="../static/css/amazeui.css" />
 		<link rel="stylesheet" href="../static/css/core.css" />
 		<link rel="stylesheet" href="../static/css/menu.css" />
@@ -89,7 +90,7 @@
 						      <a class="am-cf" data-am-collapse="{target: '#collapse-nav1'}"><span class="am-icon-table"></span> 消费支出 <span class="am-icon-angle-right am-fr am-margin-right"></span></a>
 						      <ul class="am-list am-collapse admin-sidebar-sub am-in" id="collapse-nav1">
 						        <li><a href="/" class="am-cf"> <span>支出预览</span></a></li>
-						        <li><a href="/complete">支出明细</a></li>
+						        <li><a href="/details">支出明细</a></li>
 						      </ul>
 						    </li>
 						    <li class="admin-parent">
@@ -120,11 +121,14 @@
 		<!-- 在小屏幕上显示的一个按钮，点击后会弹出侧边栏菜单 -->
 		<a href="admin-offcanvas" class="am-icon-btn am-icon-th-list am-show-sm-only admin-menu" data-am-offcanvas="{target: '#admin-offcanvas'}"><!--<i class="fa fa-bars" aria-hidden="true"></i>--></a>
 		
-		<!-- 引入 js脚本 jQuery,AmazeUI ,blockUI,echarts-->
+		<!-- 引入 js脚本 jQuery,AmazeUI ,blockUI,boostrap,echarts-->
 		<script type="text/javascript" src="../static/js/jquery-2.1.0.js" ></script>
 		<script type="text/javascript" src="../static/js/amazeui.min.js"></script>
 		<script type="text/javascript" src="../static/js/app.js" ></script>
 		<script type="text/javascript" src="../static/js/blockUI.js" ></script>
+		<script type="text/javascript" src="../static/js/bootstrap.bundle.js" ></script>
+
+		<!-- echarts -->
 		<script type="text/javascript" src="../static/js/charts/echarts.min.js" ></script>
 		<script type="text/javascript" src="../static/js/charts/indexChart.js" ></script>
         <!-- 柱状 -->

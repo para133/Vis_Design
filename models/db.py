@@ -36,17 +36,27 @@ class BillDataBase:
     # 保存账单数据
     def save_bill(self, bill_path, user_id):
         user = User.query.get(user_id)
-        with open(bill_path, 'r', encoding='utf-8') as f:
-            first_line = f.readline().strip()
-            if '微信支付账单明细' in first_line:
-                platform = 'wechat'
-            else:
-                platform = 'alipay'
+        encoding = 'utf-8'
+        try:
+            with open(bill_path, 'r', encoding='utf-8') as f:
+                first_line = f.readline().strip()
+                if '微信支付账单明细' in first_line:
+                    platform = 'wechat'
+                else:
+                    platform = 'alipay'
+        except Exception as e:
+            encoding = 'gbk'
+            with open(bill_path, 'r', encoding='gbk') as f:
+                first_line = f.readline().strip()
+                if '微信支付账单明细' in first_line:
+                    platform = 'wechat'
+                else:
+                    platform = 'alipay'
                 
         if platform == 'wechat':
-            self.import_wechat_csv(bill_path, user)
+            self.import_wechat_csv(bill_path, user,encoding)
         elif platform == 'alipay':
-            self.import_alipay_csv(bill_path, user)
+            self.import_alipay_csv(bill_path, user,encoding)
     
     # 按照日期获取用户的账单
     def get_bills(self, user_id, start_date=None, end_date=None):
@@ -57,8 +67,8 @@ class BillDataBase:
             query = query.filter(Bill.transaction_time <= end_date)
         return query.all()
     
-    def import_wechat_csv(self, bill_path, user: User):
-        with open(bill_path, 'r', encoding='utf-8') as f:
+    def import_wechat_csv(self, bill_path, user: User,encoding):
+        with open(bill_path, 'r', encoding=encoding) as f:
             reader = csv.reader(f)
             # 跳过头部说明行
             while True:
@@ -110,8 +120,8 @@ class BillDataBase:
                 self.db.session.add(bill)
             self.db.session.commit()
             
-    def import_alipay_csv(self, bill_path, user: User):
-        with open(bill_path, 'r', encoding='utf-8') as f:
+    def import_alipay_csv(self, bill_path, user: User,encoding):
+        with open(bill_path, 'r', encoding=encoding) as f:
             reader = csv.reader(f)
             # 跳过头部说明行
             while True:
@@ -174,5 +184,31 @@ class BillDataBase:
             for bill in bills:
                 print(bill)
 
+    def get_bill_table_data(self, user_id, start_date=None, end_date=None):
+        """
+        查询账单明细，返回适合表格渲染的 data 字典
+        """
+        query = Bill.query.filter_by(user_id=user_id)
+        if start_date:
+            query = query.filter(Bill.transaction_time >= start_date)
+        if end_date:
+            query = query.filter(Bill.transaction_time <= end_date)
+        bills = query.order_by(Bill.transaction_time.desc()).all()
+
+        data = {}
+        for idx, bill in enumerate(bills, 1):
+            data[idx] = [
+                idx,  # 序号
+                bill.platform,
+                bill.transaction_time.strftime("%Y-%m-%d %H:%M:%S") if bill.transaction_time else "",
+                bill.category or "",
+                bill.product or "",
+                bill.counterparty or "",
+                bill.income_or_expense or "",
+                bill.amount,
+                bill.payment_method or "",
+                bill.current_status or ""
+            ]
+        return data
         
         
