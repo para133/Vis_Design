@@ -1,5 +1,6 @@
 
-!function($) {
+var resizefunc = [];
+!function ($) {
     "use strict";
 
     var Sidemenu = function() {
