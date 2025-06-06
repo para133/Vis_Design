@@ -27,7 +27,7 @@ VisDesign/
     ├── templates/
     │   └── index.html
     ├── models\
-    │    └── data.py // 数据库模型数据结果
+    │    └── data.py // 数据库模型数据结构
     │    └── db.py // 数据库操作类
     ├── uploads/
     │   └── (账单文件上传目录)

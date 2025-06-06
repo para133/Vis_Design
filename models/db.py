@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -66,6 +66,22 @@ class BillDataBase:
         if end_date:
             query = query.filter(Bill.transaction_time <= end_date)
         return query.all()
+    
+    # 获取用户最新的账单日期
+    def get_latest_billdate(self, user_id):
+        latest_bill = Bill.query.filter_by(user_id=user_id).order_by(Bill.transaction_time.desc()).first()
+        if latest_bill:
+            return latest_bill.transaction_time
+        else:
+            return datetime.now()
+        
+    # 获取用户最早的账单日期
+    def get_earliest_billdate(self, user_id):
+        earliest_bill = Bill.query.filter_by(user_id=user_id).order_by(Bill.transaction_time.asc()).first()
+        if earliest_bill:
+            return earliest_bill.transaction_time
+        else:
+            return datetime.now()
     
     def import_wechat_csv(self, bill_path, user: User,encoding):
         with open(bill_path, 'r', encoding=encoding) as f:
@@ -229,7 +245,24 @@ class BillDataBase:
         dict = {category: total_amount for category, total_amount in results}
         data = [{"value": v, "name": k} for k, v in dict.items()]
         return data
-        
+    
+    def get_last_week_expend_bar_data(self, user_id):
+        today = datetime.now()
+        last_week_start = today - timedelta(days=6)
+        bills = self.get_bills(user_id, start_date=last_week_start, end_date=today)
+        # 只统计支出
+        expend_bills = [bill for bill in bills if hasattr(bill, "income_or_expense") and bill.income_or_expense == "支出"]
+        # 初始化每天的金额为0，key为"MM-DD"
+        date_list = [(last_week_start + timedelta(days=i)).strftime("%m-%d") for i in range(7)]
+        date_amount = {d: 0.0 for d in date_list}
+        for bill in expend_bills:
+            day = bill.transaction_time.strftime("%m-%d")
+            if day in date_amount:
+                date_amount[day] += bill.amount
+        dates = list(date_amount.keys())
+        counts = list(date_amount.values())
+        return {"date": dates, "counts": counts}
+
     def get_highest_expend(self, user_id, start_date=None, end_date=None):
         """
         获取最高支出数值（保留3位小数，字符串类型）
@@ -286,3 +319,5 @@ class BillDataBase:
         
         total = query.with_entities(func.sum(Bill.amount)).scalar() or 0
         return f"{total:.3f}"
+                
+        

@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-
 		<header class="am-topbar am-topbar-fixed-top">
 			<div class="am-topbar-left am-hide-sm-only">
                 <img src="../static/img/title.png" alt="BillAnalysis Logo" style="height:60px;">
@@ -183,14 +181,78 @@
 						</div>
 					</div>
 					
-
-					<div class="am-u-md-4">
-						<div class="card-box">
-							<h4 class="header-title m-t-0">近一周消费</h4>
+                    <div class="am-u-md-4">
+                        <div class="card-box">
+                            <h4 class="header-title m-t-0">近一周消费</h4>
                             <!-- 近一周消费柱状图 -->
-							<div id="index-bar-1" style="height: 345px;height: 300px;"></div>
-						</div>
-					</div>
+                            <div id="index-bar-1" style="height: 345px;"></div>
+
+                            <!-- 用于存储 bar_data -->
+                            <div id="bar_data" data-json='{{ bar_data|tojson }}' style="display: none;"></div>
+
+                            <script>
+                                var barData = JSON.parse(document.getElementById("bar_data").getAttribute("data-json"));
+                                var xData = barData.date;    // x 轴为日期
+                                var yData = barData.counts;  // y 轴为消费总金额
+
+                                // 初始化图表
+                                var myChart = echarts.init(document.getElementById("index-bar-1"));
+                                var option = {
+                                color: ['#3398DB'],
+                                tooltip: {
+                                    trigger: 'axis',
+                                    axisPointer: {
+                                    type: 'shadow'
+                                    }
+                                },
+                                grid: {
+                                    bottom: 20,
+                                    left: 30,
+                                    containLabel: true
+                                },
+                                xAxis: [
+                                    {
+                                    type: 'category',
+                                    name: '日期',
+                                    nameLocation: 'middle',
+                                    nameGap: 20,
+                                    data: xData,
+                                    axisTick: {
+                                        alignWithLabel: true
+                                    },
+                                    axisLabel: {
+                                        interval: 0,      // 关键：强制全部显示
+                                        fontSize: 12      // 可选：字体大小调整
+                                    }
+                                    }
+                                ],
+                                yAxis: [
+                                    {
+                                    type: 'value',
+                                    name: '消费总金额',
+                                    nameLocation: 'end',
+                                    nameGap: 30,
+                                    nameTextStyle: {
+                                    fontSize: 12,
+                                    color: '#666'
+                                    }
+                                    }
+                                ],
+                                series: [
+                                    {
+                                    name: '消费总金额',
+                                    type: 'bar',
+                                    barWidth: '60%',
+                                    data: yData
+                                    }
+                                ]
+                                };
+
+                                // 使用刚指定的配置项和数据显示图表
+                                myChart.setOption(option);
+                            </script>
+                        </div>
+                    </div>
 					
 					<div class="am-u-md-4">
 						<div class="card-box">

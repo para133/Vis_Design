@@ -28,7 +28,7 @@
                                 <div class="am-input-group am-input-group-sm" style="display: flex; flex-direction: row; align-items: center; gap: 12px; background: #f0f4fa; border-radius: 6px; padding: 8px 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
                                     <div style="display: flex; flex-direction: column; align-items: flex-start;">
                                         <label style="color: #333; font-weight: 500; margin-bottom: 2px;">起始日期</label>
-                                        <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}" style="width:130px; border: 1px solid #d9e3ef; border-radius: 4px; padding: 4px 8px;">
+                                        <input type="date" name="start_date" value="{{ request.args.get('start_date', '') }}" style="width:130px; border: 1px solid #d9e3ef; border-radius: 4px; padding: 4px 8px;" id="start-date-input">
                                     </div>
                                     <span style="color: #888; margin-top: 18px;">至</span>
                                     <div style="display: flex; flex-direction: column; align-items: flex-start;">
@@ -40,15 +40,19 @@
                                     </span>
                                 </div>
                                 <script>
-                                    // 设置结束日期默认值为今天
+                                    // 设置起始日期为记录中最早的一天，结束日期默认值为今天
                                     (function() {
+                                        var earliestDateStr = "{{ start_date.strftime('%Y-%m-%d') }}";
+                                        var endDateStr = "{{ end_date.strftime('%Y-%m-%d') }}";
+
+                                        var startInput = document.getElementById('start-date-input');
+                                        if (!startInput.value) {
+                                            startInput.value = earliestDateStr;
+                                        }
+
                                         var endInput = document.getElementById('end-date-input');
                                         if (!endInput.value) {
-                                            var today = new Date();
-                                            var yyyy = today.getFullYear();
-                                            var mm = String(today.getMonth() + 1).padStart(2, '0');
-                                            var dd = String(today.getDate()).padStart(2, '0');
-                                            endInput.value = yyyy + '-' + mm + '-' + dd;
+                                            endInput.value = endDateStr;
                                         }
                                     })();
                                 </script>
