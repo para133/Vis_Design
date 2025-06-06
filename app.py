@@ -21,6 +21,75 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 billdatabase = BillDataBase(app, db)
 
+def get_pie_data():
+    """
+    获取用户的支出分类饼图数据
+    """
+    user_id = session.get('user_id')
+    data = billdatabase.get_expend_classification_pie_data(user_id)
+    return data
+def get_username():
+    """
+    获取当前登录用户的用户名
+    """
+    user = billdatabase.get_user(session['user_id'])
+    return user.username if user else ""
+
+
+
+
+
+
+
+# 首页路由
+@app.route('/')
+def index():
+    # 检查用户是否已登录
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    user = billdatabase.get_user(session['user_id'])
+    if not user:
+        # 如果用户不存在，重定向到登录页
+        return redirect(url_for('login'))
+    else:
+        # 如果已登录，渲染主页
+        # TODO 首页dashboard渲染
+        pie_data = get_pie_data()
+        print(pie_data)
+        #
+        return render_template('index.html', username=user.username,
+                               pie_data=pie_data)
+
+# 上传数据文件
+@app.route('/upload', methods=['POST'])
+def upload():
+    message = '文件上传成功'
+    if 'file' not in request.files:
+        message = '请求中没有文件部分'
+    file = request.files['file']
+    if file.filename == '':
+        message = '没有选择文件'
+
+    # 检查文件类型
+    if not file.filename.endswith('.csv'):
+        message = '只支持上传CSV文件'
+    if file:
+        if message != '文件上传成功':
+            message_type = 'error'
+        else:
+            message_type = 'success'
+            # 保存文件到指定目录
+            file_path = os.path.join(BASE_DIR, 'uploads', file.filename)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            file.save(file_path)
+            billdatabase.save_bill(file_path, session['user_id'])
+            start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
+            end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
+            res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
+    return render_template('index.html', username=get_username(),message=message, message_type=message_type,
+                           pie_data=get_pie_data())
+
+
 # 账单明细
 @app.route('/details', methods=['GET'])
 def details():
@@ -39,53 +108,9 @@ def details():
     prev_page = page - 1 if page > 1 else None
     next_page = page + 1 if page * per_page < len(all_index) else None
 
-    return render_template('details.html',data=data, index_list=index_list, total=total,
-                           page=page, prev_page=prev_page, next_page=next_page, username=user.username, start_date=start_date, end_date=end_date)
-
-
-# 上传数据文件
-@app.route('/upload', methods=['POST'])
-def upload():
-    if 'file' not in request.files:
-        return render_template('index.html', message='请求中没有文件部分',  message_type='error')
-
-    file = request.files['file']
-    if file.filename == '':
-        return render_template('index.html', message='没有选择文件',  message_type='error')
-
-    # 检查文件类型
-    if not file.filename.endswith('.csv'):
-        return render_template('index.html', message='只支持CSV文件',  message_type='error')
-
-    if file:
-        # 保存文件到指定目录
-        file_path = os.path.join(BASE_DIR, 'uploads', file.filename)
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        file.save(file_path)
-        billdatabase.save_bill(file_path, session['user_id'])
-        start_date = billdatabase.get_earliest_billdate(session['user_id'])
-        end_date = billdatabase.get_latest_billdate(session['user_id'])
-        res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
-        
-        return render_template('index.html', message='文件上传成功', message_type='success')
-    return render_template('index.html', message='文件上传失败', message_type='error')
-
-# 首页路由
-@app.route('/')
-def index():
-    # 检查用户是否已登录
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    user = billdatabase.get_user(session['user_id'])
-    if not user:
-        # 如果用户不存在，重定向到登录页
-        return redirect(url_for('login'))
-    else:
-        # 如果已登录，渲染主页
-        # TODO 首页dashboard渲染
-        #
-        #
-        return render_template('index.html', username=user.username)
+    return render_template('details.html',data=data,index_list=index_list,total=total,
+                           page=page,prev_page=prev_page,next_page=next_page,username=user.username)
+    
 
 # 用户登录路由
 @app.route('/login', methods=['GET', 'POST'])

@@ -115,10 +115,8 @@ option = {
 })();
 
 
-/**
- *  消费分类
- *
- */
+
+// 消费分类饼图
 (function(){
 
     var myChart = echarts.init(document.getElementById("index-pie-1"));

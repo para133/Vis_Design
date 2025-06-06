@@ -2,7 +2,7 @@
 {% block content %}
 
 
-    <!-- Begin page -->
+
 		<header class="am-topbar am-topbar-fixed-top">
 			<div class="am-topbar-left am-hide-sm-only">
                 <img src="../static/img/title.png" alt="BillAnalysis Logo" style="height:60px;">
@@ -10,17 +10,11 @@
 
 			<div class="contain">
 				<ul class="am-nav am-navbar-nav am-navbar-left">
-
 					<li><h4 class="page-title">支出预览</h4></li>
 				</ul>
-
 			</div>
 		</header>
-    <!-- end page -->
 
-	<!--	<div class="am-g">-->
-		<!-- ============================================================== -->
-		<!-- Start right Content here -->
 
 
 		<div class="content-page">
@@ -97,13 +91,102 @@
 					<div class="am-u-md-4">
 						<div class="card-box">
 							<h4 class="header-title m-t-0">消费分类</h4>
+
+                            <!-- 消费分类饼图 input: pie_data [{'value':v,'name':k},...] -->
 							<div id="index-pie-1" style="height: 345px;height: 300px;"></div>
+  
+                            <div id="pie_data" data-json='{{ pie_data|tojson }}'></div>
+                            <script>
+                                var myChart = echarts.init(document.getElementById("index-pie-1"));
+                                var pie_data = JSON.parse(document.getElementById("pie_data").dataset.json);
+
+                                
+                                pie_data.sort(function(a, b) { return b.value - a.value; });
+                                var top10 = pie_data.slice(0, 10);
+                                
+                                var option = {
+                                    tooltip : {
+                                        trigger: 'item',
+                                        // 显示两位小数
+                                        formatter: function(params) {
+                                            return params.seriesName + '<br/>' +
+                                                params.name + ' : ' + params.value + ' (' + 
+                                                (params.percent ? params.percent.toFixed(2) : '0.00') + '%)';
+                                        },
+                                        confine: true // 自适应位置，防止溢出
+                                    },
+                                    // 图例只显示前10个占比最高的分类
+                                    legend: {
+                                        orient : 'vertical',
+                                        left : 'left',
+                                        data: top10.map(function(item){ return item.name; })
+                                    },
+                                    toolbox: {
+                                        show : true,
+                                        feature : {
+                                            mark : {show: true},
+                                            dataView : {show: true, readOnly: false},
+                                            magicType : {
+                                                show: true, 
+                                                type: ['pie', 'funnel'],
+                                                option: {
+                                                    funnel: {
+                                                        x: '25%',
+                                                        width: '50%',
+                                                        funnelAlign: 'center',
+                                                        max: 1548
+                                                    }
+                                                }
+                                            },
+                                            restore : {show: true},
+                                            saveAsImage : {show: true}
+                                        }
+                                    },
+                                    calculable : true,
+                                    series : [
+                                        {
+                                            name:'类别',
+                                            type:'pie',
+                                            radius : ['50%', '70%'],
+                                            itemStyle : {
+                                                normal : {
+                                                    label : {
+                                                        show : false
+                                                    },
+                                                    labelLine : {
+                                                        show : false
+                                                    }
+                                                },
+                                                emphasis : {
+                                                    label : {
+                                                        show : true,
+                                                        position : 'center',
+                                                        textStyle : {
+                                                            fontSize : '20',
+                                                            fontWeight : 'bold'
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            data: pie_data.map(function(item) {
+                                                return {
+                                                    value: item.value,
+                                                    name: item.name
+                                                };
+                                            })
+                                        }
+                                    ]
+                                };
+                            myChart.setOption(option);
+                            </script>
 						</div>
 					</div>
 					
+
 					<div class="am-u-md-4">
 						<div class="card-box">
 							<h4 class="header-title m-t-0">近一周消费</h4>
+                            <!-- 近一周消费柱状图 -->
 							<div id="index-bar-1" style="height: 345px;height: 300px;"></div>
 						</div>
 					</div>
@@ -111,6 +194,7 @@
 					<div class="am-u-md-4">
 						<div class="card-box">
 							<h4 class="header-title m-t-0">两周高低消费对比</h4>
+                            <!-- 两周高低消费对比折线图 -->
 							<div id="index-line-1" style="height: 345px;height: 300px;"></div>
 						</div>
 					</div>
@@ -128,6 +212,7 @@
 						<div class="am-u-md-4">
 							<div class="card-box">
 								<h4 class="header-title m-t-0 m-b-30">消费活跃区域</h4>
+                                <!-- 消费活跃区域视图 -->
 								<div class="inbox-widget nicescroll" style="height: 315px; overflow: hidden; outline: none;" tabindex="5000">
 
 
@@ -159,6 +244,8 @@
 						</div>
 						<!-- col end -->
 						
+
+                        <!-- 消费清单部分 -->
 						<!-- col start -->
 						<div class="am-u-md-8">
 							<div class="card-box">
@@ -258,11 +345,7 @@
 						</div>
 						<!-- col end -->
 					</div>
-					<!--&lt;!&ndash; Row end &ndash;&gt;<a href="http://www.aspku.com/" target="_blank">源码之家</a>-->
-					
-				
-			
-				
+
 			</div>
 		</div>
 

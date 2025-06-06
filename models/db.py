@@ -226,5 +226,24 @@ class BillDataBase:
                 bill.current_status or ""
             ]
         return data
+    
+    def get_expend_classification_pie_data(self, user_id, start_date=None, end_date=None):
+        """
+        获取支出分类饼图数据
+        """
+        query = Bill.query.filter_by(user_id=user_id, income_or_expense='支出')
+        if start_date:
+            query = query.filter(Bill.transaction_time >= start_date)
+        if end_date:
+            query = query.filter(Bill.transaction_time <= end_date)
+        
+        results = query.with_entities(
+            Bill.category,
+            func.sum(Bill.amount).label('total_amount')
+        ).group_by(Bill.category).all()
+        
+        dict = {category: total_amount for category, total_amount in results}
+        data = [{"value": v, "name": k} for k, v in dict.items()]
+        return data
         
         
