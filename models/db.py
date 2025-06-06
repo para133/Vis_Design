@@ -230,4 +230,59 @@ class BillDataBase:
         data = [{"value": v, "name": k} for k, v in dict.items()]
         return data
         
+    def get_highest_expend(self, user_id, start_date=None, end_date=None):
+        """
+        获取最高支出数值（保留3位小数，字符串类型）
+        """
+        query = Bill.query.filter_by(user_id=user_id, income_or_expense='支出')
+        if start_date:
+            query = query.filter(Bill.transaction_time >= start_date)
+        if end_date:
+            query = query.filter(Bill.transaction_time <= end_date)
         
+        result = query.order_by(Bill.amount.desc()).first()
+        if result:
+            return f"{result.amount:.3f}"
+        else:
+            return "0.000"
+    def get_highest_income(self, user_id, start_date=None, end_date=None):
+        """
+        获取最高收入数值（保留3位小数，字符串类型）
+        """
+        query = Bill.query.filter_by(user_id=user_id, income_or_expense='收入')
+        if start_date:
+            query = query.filter(Bill.transaction_time >= start_date)
+        if end_date:
+            query = query.filter(Bill.transaction_time <= end_date)
+        
+        result = query.order_by(Bill.amount.desc()).first()
+        if result:
+            return f"{result.amount:.3f}"
+        else:
+            return "0.000"
+        
+    def get_total_expend(self, user_id, start_date=None, end_date=None):
+        """
+        获取总支出，保留三位小数，返回字符串
+        """
+        query = Bill.query.filter_by(user_id=user_id, income_or_expense='支出')
+        if start_date:
+            query = query.filter(Bill.transaction_time >= start_date)
+        if end_date:
+            query = query.filter(Bill.transaction_time <= end_date)
+        
+        total = query.with_entities(func.sum(Bill.amount)).scalar() or 0
+        return f"{total:.3f}"
+    
+    def get_total_income(self, user_id, start_date=None, end_date=None):
+        """
+        获取总收入
+        """
+        query = Bill.query.filter_by(user_id=user_id, income_or_expense='收入')
+        if start_date:
+            query = query.filter(Bill.transaction_time >= start_date)
+        if end_date:
+            query = query.filter(Bill.transaction_time <= end_date)
+        
+        total = query.with_entities(func.sum(Bill.amount)).scalar() or 0
+        return f"{total:.3f}"

@@ -36,8 +36,20 @@ def get_username():
     return user.username if user else ""
 
 
-
-
+# 缓存用户数据 （登录成功后与上传文件后需要刷新)
+def refresh_user_data(user_id):
+    # 查询数据库
+    total_expend = billdatabase.get_total_expend(user_id)
+    total_income = billdatabase.get_total_income(user_id)
+    m_expend = billdatabase.get_highest_expend(user_id)
+    m_income = billdatabase.get_highest_income(user_id)
+    pie_data = get_pie_data()
+    # 存到 session
+    session['total_expend'] = total_expend
+    session['total_income'] = total_income
+    session['m_expend'] = m_expend
+    session['m_income'] = m_income
+    session['pie_data'] = pie_data
 
 
 
@@ -54,25 +66,32 @@ def index():
     else:
         # 如果已登录，渲染主页
         # TODO 首页dashboard渲染
-        pie_data = get_pie_data()
-        print(pie_data)
-        #
-        return render_template('index.html', username=user.username,
-                               pie_data=pie_data)
+
+
+        
+        return render_template('index.html',
+            username=get_username(),
+            total_expend=session.get('total_expend', 0),
+            total_income=session.get('total_income', 0),
+            m_expend=session.get('m_expend', 0),
+            m_income=session.get('m_income', 0),
+            pie_data=session.get('pie_data', [])
+        )
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
 def upload():
     message = '文件上传成功'
+    message_type = 'success'
     if 'file' not in request.files:
         message = '请求中没有文件部分'
     file = request.files['file']
     if file.filename == '':
         message = '没有选择文件'
-
     # 检查文件类型
     if not file.filename.endswith('.csv'):
         message = '只支持上传CSV文件'
+        
     if file:
         if message != '文件上传成功':
             message_type = 'error'
@@ -83,11 +102,19 @@ def upload():
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             file.save(file_path)
             billdatabase.save_bill(file_path, session['user_id'])
-            start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
-            end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
-            res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
-    return render_template('index.html', username=get_username(),message=message, message_type=message_type,
-                           pie_data=get_pie_data())
+            
+            # 刷新数据
+            refresh_user_data(session['user_id'])
+            
+    return render_template('index.html',message=message, message_type=message_type,
+        username=get_username(),
+        total_expend=session.get('total_expend', 0),
+        total_income=session.get('total_income', 0),
+        m_expend=session.get('m_expend', 0),
+        m_income=session.get('m_income', 0),
+        pie_data=session.get('pie_data', [])
+    )
+
 
 
 # 账单明细
@@ -124,6 +151,7 @@ def login():
            # 如果该用户名存在，则检查密码 
             if user.password == password:
                 session['user_id'] = user.id
+                refresh_user_data(user.id)  # 刷新用户数据
                 return redirect(url_for('index'))
             else:
                 # 密码错误提示
