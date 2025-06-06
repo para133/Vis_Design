@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request, jsonify,render_template,redirect, url_for,session
+from flask import Flask, request, jsonify, render_template,redirect, url_for,session
 
 from models.data import db
 from models.db import BillDataBase
@@ -25,8 +25,8 @@ billdatabase = BillDataBase(app, db)
 @app.route('/details', methods=['GET'])
 def details():
     user = billdatabase.get_user(session['user_id'])
-    start_date = request.args.get('start_date', None)
-    end_date = request.args.get('end_date', None)
+    start_date = request.args.get('start_date', billdatabase.get_earliest_billdate(session['user_id']).strftime("%Y-%m-%d"))
+    end_date = request.args.get('end_date', datetime.now().strftime("%Y-%m-%d"))
     start_date = datetime.strptime(start_date, "%Y-%m-%d") if start_date else None
     end_date = datetime.strptime(end_date, "%Y-%m-%d") if end_date else None
     data = billdatabase.get_bill_table_data(user.id,start_date=start_date, end_date=end_date)
@@ -39,8 +39,8 @@ def details():
     prev_page = page - 1 if page > 1 else None
     next_page = page + 1 if page * per_page < len(all_index) else None
 
-    return render_template('details.html',data=data,index_list=index_list,total=total,
-                           page=page,prev_page=prev_page,next_page=next_page,username=user.username)
+    return render_template('details.html',data=data, index_list=index_list, total=total,
+                           page=page, prev_page=prev_page, next_page=next_page, username=user.username, start_date=start_date, end_date=end_date)
 
 
 # 上传数据文件
@@ -63,11 +63,10 @@ def upload():
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         file.save(file_path)
         billdatabase.save_bill(file_path, session['user_id'])
-        # start_date = datetime.strptime("2025-03-05 17:44:17", "%Y-%m-%d %H:%M:%S")
-        # end_date = datetime.strptime("2025-03-29 11:53:14", "%Y-%m-%d %H:%M:%S")
-        # res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
+        start_date = billdatabase.get_earliest_billdate(session['user_id'])
+        end_date = billdatabase.get_latest_billdate(session['user_id'])
+        res = billdatabase.get_bills(session['user_id'], start_date=start_date, end_date=end_date) 
         
-
         return render_template('index.html', message='文件上传成功', message_type='success')
     return render_template('index.html', message='文件上传失败', message_type='error')
 
@@ -87,9 +86,6 @@ def index():
         #
         #
         return render_template('index.html', username=user.username)
-
-
-    
 
 # 用户登录路由
 @app.route('/login', methods=['GET', 'POST'])

@@ -67,6 +67,22 @@ class BillDataBase:
             query = query.filter(Bill.transaction_time <= end_date)
         return query.all()
     
+    # 获取用户最新的账单日期
+    def get_latest_billdate(self, user_id):
+        latest_bill = Bill.query.filter_by(user_id=user_id).order_by(Bill.transaction_time.desc()).first()
+        if latest_bill:
+            return latest_bill.transaction_time
+        else:
+            return datetime.now()
+        
+    # 获取用户最早的账单日期
+    def get_earliest_billdate(self, user_id):
+        earliest_bill = Bill.query.filter_by(user_id=user_id).order_by(Bill.transaction_time.asc()).first()
+        if earliest_bill:
+            return earliest_bill.transaction_time
+        else:
+            return datetime.now()
+    
     def import_wechat_csv(self, bill_path, user: User,encoding):
         with open(bill_path, 'r', encoding=encoding) as f:
             reader = csv.reader(f)
