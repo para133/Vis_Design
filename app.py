@@ -22,20 +22,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 billdatabase = BillDataBase(app, db)
 
-def get_pie_data():
-    """
-    获取用户的支出分类饼图数据
-    """
-    user_id = session.get('user_id')
-    data = billdatabase.get_expend_classification_pie_data(user_id)
-    return data
 
-def get_bar_data():
-    """
-    获取用户的支出分类柱状图数据
-    """
-    data = billdatabase.get_last_week_expend_bar_data(session['user_id'])
-    return data
 
 def get_username():
     """
@@ -64,6 +51,9 @@ def refresh_user_data(user_id):
     if float(total_income) != 0:
         session['income_percent'] = float(m_income) / float(total_income) * 100
     session['pie_data'] = pie_data
+    session['bar_data'] = billdatabase.get_last_week_expend_bar_data(user_id)
+    
+    
     
 # 首页路由
 @app.route('/')
@@ -78,12 +68,16 @@ def index():
     else:
         # 如果已登录，渲染主页
         # TODO 首页dashboard渲染
-        pie_data = get_pie_data()
-        bar_data = get_bar_data()
-        print(bar_data)
-        #
+
         return render_template('index.html', username=user.username,
-                               pie_data=pie_data, bar_data=bar_data)
+                                 total_expend=session.get('total_expend', 0),
+                                 total_income=session.get('total_income', 0),
+                                 m_expend=session.get('m_expend', 0),
+                                 m_income=session.get('m_income', 0),
+                                 expend_percent=session.get('expend_percent', 0),
+                                 income_percent=session.get('income_percent', 0),
+                                 pie_data=session.get('pie_data', []),
+                                 bar_data=session.get('bar_data', []))
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
@@ -109,10 +103,17 @@ def upload():
             os.makedirs(os.path.dirname(file_path), exist_ok=True)
             file.save(file_path)
             billdatabase.save_bill(file_path, session['user_id'])
-
+            # 刷新用户数据
+            refresh_user_data(session['user_id'])
     return render_template('index.html', username=get_username(),message=message, message_type=message_type,
-                           pie_data=get_pie_data())
-
+                            total_expend=session.get('total_expend', 0),
+                            total_income=session.get('total_income', 0),
+                            m_expend=session.get('m_expend', 0),
+                            m_income=session.get('m_income', 0),
+                            expend_percent=session.get('expend_percent', 0),
+                            income_percent=session.get('income_percent', 0),
+                            pie_data=session.get('pie_data', []),
+                            bar_data=session.get('bar_data', []))
 
 # 账单明细
 @app.route('/details', methods=['GET'])
