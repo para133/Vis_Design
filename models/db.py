@@ -443,4 +443,46 @@ class BillDataBase:
             })
         return result
             
-    
+    def get_last_half_year_expend(self, user_id):
+        """
+        获取最近半年每月前五类支出数据，每类每月的消费金额
+        """
+        today = datetime.now()
+        six_months_ago = today - timedelta(days=180)
+        
+        bills = self.get_bills(user_id, start_date=six_months_ago, end_date=today)
+        expend_bills = [bill for bill in bills if hasattr(bill, "income_or_expense") and bill.income_or_expense == "支出"]
+        
+        if not expend_bills:
+            return []
+        
+        # 统计半年内所有分类总金额，取前五类
+        category_sum = {}
+        for bill in expend_bills:
+            cat = bill.category or "其他"
+            category_sum[cat] = category_sum.get(cat, 0) + bill.amount
+        top5_cats = [k for k, v in sorted(category_sum.items(), key=lambda x: x[1], reverse=True)[:5]]
+
+        # 统计每月每类金额
+        month_cat_sum = {}
+        for bill in expend_bills:
+            month = bill.transaction_time.strftime("%Y-%m")
+            cat = bill.category or "其他"
+            if cat not in top5_cats:
+                continue
+            key = (month, cat)
+            month_cat_sum[key] = month_cat_sum.get(key, 0) + bill.amount
+
+        # 补全每个月每类（无则为0）
+        months = set(bill.transaction_time.strftime("%Y-%m") for bill in expend_bills)
+        result = []
+        for month in sorted(months):
+            for cat in top5_cats:
+                amount = round(month_cat_sum.get((month, cat), 0), 2)
+                result.append({
+                    "月份": month,
+                    "分类": cat,
+                    "金额": amount
+                })
+        return result
+        

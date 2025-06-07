@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+
+		<!-- Begin page -->
+		<header class="am-topbar am-topbar-fixed-top">		
+			<div class="am-topbar-left am-hide-sm-only">
+                <a href="index.html" class="logo"><span>wechat<span>Bill</span></span><i class="zmdi zmdi-layers"></i></a>
+            </div>
+	
+			<div class="contain">
+				<ul class="am-nav am-navbar-nav am-navbar-left">
+
+					<li><h4 class="page-title">消费支收</h4></li>
+				</ul>
+				
+				<ul class="am-nav am-navbar-nav am-navbar-right">
+					<li class="inform"><i class="am-icon-bell-o" aria-hidden="true"></i></li>
+					<li class="hidden-xs am-hide-sm-only">
+                        <form role="search" class="app-search">
+                            <input type="text" placeholder="Search..." class="form-control">
+                            <a href=""><img src="../static/img/search.png"></a>
+                        </form>
+                    </li>
+				</ul>
+			</div>
+		</header>
+		<!-- end page -->
+
+		
+	    <!--	<div class="am-g">-->
+		<!-- ============================================================== -->
+		<!-- Start right Content here -->
+		<div class="content-page">
+			<!-- Start content -->
+			<div class="content">
+				<div class="am-g">
+					<div class="am-u-md-6" >
+						<!-- 折线图堆叠 -->
+						<div class="card-box">
+							<div  id="columnar1" style="width: 100%;height: 400px;"></div>
+						</div>
+					</div>
+					
+					<div class="am-u-md-6">
+						<!-- 堆叠区域图  -->
+						<div id="last_half_year_expend_data" data-json='{{ last_half_year_expend|tojson }}'></div>
+						<div class="card-box">
+							<div id="columnar2" style="width: 100%; height: 400px;"></div>
+						</div>
+						<script>
+							var expendData = JSON.parse(document.getElementById("last_half_year_expend_data").getAttribute("data-json"));
+
+							// 先提取所有出现的月份（去重排序）
+							var monthsSet = new Set(expendData.map(item => item["月份"]));
+							var months = Array.from(monthsSet).sort();  // 升序
+
+							// 提取所有出现的分类（去重排序）
+							var categoriesSet = new Set(expendData.map(item => item["分类"]));
+							var categories = Array.from(categoriesSet);
+
+							// 生成每个分类对应的每月金额（如果没有则补0）
+							var categoryDataMap = {};
+							categories.forEach(function(cat) {
+								categoryDataMap[cat] = months.map(function(month) {
+									var item = expendData.find(e => e["月份"] === month && e["分类"] === cat);
+									return item ? item["金额"] : 0;
+								});
+							});
+
+							// 构造 series 数据
+							var seriesData = categories.map(function(cat) {
+								return {
+									name: cat,
+									type: 'bar',
+									stack: '总量',
+									label: {
+										show: true,
+										position: 'insideRight'
+									},
+									data: categoryDataMap[cat]
+								};
+							});
+
+							// 构造 ECharts 配置
+							var columnar2 = echarts.init(document.getElementById("columnar2"));
+
+							var option = {
+								title: {
+									text: "半年消费分类",
+									x: 'left'
+								},
+								tooltip: {
+									trigger: 'axis',
+									axisPointer: {
+										type: 'shadow'
+									}
+								},
+								legend: {
+									data: categories  // 使用动态获取到的分类
+								},
+								grid: {
+									left: '3%',
+									right: '4%',
+									bottom: '3%',
+									containLabel: true
+								},
+								xAxis: {
+									type: 'value'
+								},
+								yAxis: {
+									type: 'category',
+									data: months  // 使用动态获取到的月份
+								},
+								series: seriesData
+							};
+
+							columnar2.setOption(option);
+
+							
+
+						</script>
+						</div>
+					</div>
+				</div>
+				
+				<div class="am-g">
+					<div class="am-u-md-6">
+						<!-- Step Line -->
+						<div class="card-box">
+							<div  id="columnar3" style="width: 100%;height: 400px;"></div>
+						</div>
+					</div>
+					
+					<div class="am-u-md-6">
+						<!-- 大数据面积图  -->
+						<div class="card-box">
+							<div  id="columnar4" style="width: 100%;height: 400px;"></div>
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+		<!-- end right Content here -->
+		<!--</div>-->
+
+
+{% endblock %}
+
