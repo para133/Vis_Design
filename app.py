@@ -179,10 +179,12 @@ def expend_income():
     '''
     last_half_year_expend = billdatabase.get_last_half_year_expend(session['user_id'])
     last20_weeks_expend_income = billdatabase.get_last20_weeks_expend_income(session['user_id'])
+    sankey_data = billdatabase.get_sankey_data(session['user_id'])
     all_year_monthly_expend_income = billdatabase.get_all_year_monthly_expend_income(session['user_id'])
     return render_template('expend_income.html',username=get_username(),
                            last_half_year_expend=last_half_year_expend,
                            last20_weeks_expend_income=last20_weeks_expend_income,
+                           sankey_data=sankey_data,
                            all_year_monthly_expend_income=all_year_monthly_expend_income)
 
 @app.route('/logout')

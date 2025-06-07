@@ -27,12 +27,13 @@
 		<!-- end page -->
 
 		
-	    <!--	<div class="am-g">-->
-		<!-- ============================================================== -->
-		<!-- Start right Content here -->
+
+		<!-- start page -->
 		<div class="content-page">
-			<!-- Start content -->
+			<!-- start content -->
 			<div class="content">
+
+				<!-- start row1 -->
 				<div class="am-g">
 					<div id="last20_weeks_expend_income_data" data-json='{{ last20_weeks_expend_income|tojson }}'></div>
 					<div class="am-u-md-6">
@@ -159,8 +160,9 @@
 					</div>
 
 					
+					<!-- 堆叠区域图  -->
 					<div class="am-u-md-6">
-						<!-- 堆叠区域图  -->
+						
 						<div id="last_half_year_expend_data" data-json='{{ last_half_year_expend|tojson }}'></div>
 						<div class="card-box">
 							<div id="columnar2" style="width: 100%; height: 400px;"></div>
@@ -259,17 +261,74 @@
 
 							columnar2.setOption(option);
 						</script>
-						</div>
+
 					</div>
-				</div>
 				
+				</div>
+				<!-- end row1 -->
+
+
+				<!-- start row2 -->
 				<div class="am-g">
+
+					<!-- 桑基图 -->
 					<div class="am-u-md-6">
 						<!-- Step Line -->
 						<div class="card-box">
-							<div  id="columnar3" style="width: 100%;height: 400px;"></div>
+							<div  id="sankey" style="width: 100%;height: 400px;"></div>
 						</div>
+						<!-- {"nodes":nodes,"links":links} -->
+						<!-- node:string link:{"source":source,"target":target,"value":value,"type":type} -->
+						 <!--sankey_data-->
+						<div id="sankey_data" data-json='{{ sankey_data|tojson }}'></div>
+						<script>
+							var sankeyData = JSON.parse(document.getElementById("sankey_data").getAttribute("data-json"));
+							// 提取 nodes 和 links
+							var nodes = sankeyData.nodes || [];
+							var links = sankeyData.links || [];
+							var sankey = echarts.init(document.getElementById("sankey"));
+
+
+							var option = {
+								title: { text: '账单资金流向桑基图' },
+								tooltip: {
+									trigger: 'item',
+									triggerOn: 'mousemove',
+									formatter: function (params) {
+										if (params.dataType === 'edge') {
+											return params.data.source + ' → ' + params.data.target
+												+ '<br/>金额: ' + params.data.value
+												+ '<br/>类型: ' + (params.data.type === 'income' ? '收入' : '支出');
+										}
+										return params.name;
+									}
+								},
+								series: [
+									{
+										type: 'sankey',
+										nodeAlign: 'left',
+										data: nodes,
+										links: links,
+										lineStyle: { color: 'gradient', curveness: 0.5 },
+										
+										itemStyle: {
+											normal: {
+												opacity: 0.7,
+											},
+											emphasis: {
+												focus: 'adjacency'
+											},
+										},
+
+
+									}
+								],
+								color: ['#91cc75','#fac858','#ee6666','#73c0de','#3ba272','#fc8452','#9a60b4','#ea7ccc']
+							};
+							sankey.setOption(option);
+						</script>
 					</div>
+
 					
 					<div class="am-u-md-6">
 						<!-- 全年收支记录  -->
@@ -343,12 +402,14 @@
 
 						</div>
 					</div>
+
 				</div>
-				
+				<!-- end row2 -->
+
 			</div>
+			<!-- end content -->
 		</div>
-		<!-- end right Content here -->
-		<!--</div>-->
+		<!-- end page -->
 
 
 {% endblock %}

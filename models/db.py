@@ -572,3 +572,74 @@ class BillDataBase:
                 "支出": round(data["支出"], 2),
             })
         return result
+    
+    def get_sankey_data(self, user_id):
+        """
+        获取桑基图数据
+        """
+        bills = self.get_bills(user_id)
+        if not bills:
+            return {"nodes": [], "links": []}
+        links = []
+        temp_links = set()
+        for bill in bills:
+            if not hasattr(bill, "income_or_expense"):
+                continue
+            # 来源节点
+            if bill.income_or_expense == "收入":
+                source = bill.counterparty or "其他收入"
+                target = "账户"
+                type = "income"
+            elif bill.income_or_expense == "支出":
+                source = "账户"
+                target = (bill.category or "其他支出")
+                type = "expense"
+            else:
+                continue
+
+            if (source, target, type) in temp_links:
+                # 如果已存在该link，则累加value
+                for link in links:
+                    if link["source"] == source and link["target"] == target and link["type"] == type:
+                        link["value"] += round(bill.amount, 2)
+                        break
+            else:
+                temp_links.add((source, target, type))
+                links.append({
+                    "source": source,
+                    "target": target,
+                    "value": round(bill.amount, 2),
+                    "type": type
+                })
+                
+        # 累加后还是较小的节点合并
+        for link in links:
+            if link["type"] == "expense" and link["value"] < 100:
+                link["target"] = "其他"
+            elif link["type"] == "income" and link["value"] < 50:
+                link["source"] = "其他收入"
+        links = merge_links(links)
+        
+        # 构建节点列表
+        node_set = set()
+        for link in links:
+            node_set.add(link["source"])
+            node_set.add(link["target"])
+        node_list = [{"name": name} for name in node_set]
+        
+        return {
+            "nodes": node_list,
+            "links": links
+        }
+def merge_links(links):
+    """
+    合并相同 source 、 target、type 的 links
+    """
+    merged = {}
+    for link in links:
+        key = (link['source'], link['target'],link['type'])
+        if key not in merged:
+            merged[key] = link.copy()
+        else:
+            merged[key]['value'] += link['value']
+    return list(merged.values())
