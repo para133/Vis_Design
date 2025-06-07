@@ -180,7 +180,7 @@ def chart_columnar():
     消费支收图
     '''
     last_half_year_expend = session.get('last_half_year_expend', [])
-    return render_template('expend_income.html',
+    return render_template('expend_income.html',username=get_username(),
                            last_half_year_expend=last_half_year_expend,)
 
 @app.route('/logout')
