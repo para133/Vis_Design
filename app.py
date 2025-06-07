@@ -39,7 +39,7 @@ def refresh_user_data(user_id):
     pie_data = billdatabase.get_expend_classification_pie_data(user_id)
     highest_lowest_expend = billdatabase.get_highest_lowest_week_expend_income(user_id)
     top10_expend = billdatabase.get_top10_expend_bill(user_id)
-    print(top10_expend)
+    last_two_weeks_expend = billdatabase.get_last_two_week_expend(user_id)
     # 存到 session
     session['total_expend'] = total_expend
     session['total_income'] = total_income
@@ -55,6 +55,7 @@ def refresh_user_data(user_id):
     session['bar_data'] = billdatabase.get_last_week_expend_bar_data(user_id)
     session['highest_lowest_expend'] = highest_lowest_expend
     session['top10_expend'] = top10_expend
+    session['last_two_weeks_expend'] = last_two_weeks_expend
     
     
     
@@ -82,7 +83,8 @@ def index():
                                  pie_data=session.get('pie_data', []),
                                  bar_data=session.get('bar_data', []),
                                  highest_lowest_expend=session.get('highest_lowest_expend', {}),
-                                 top10_expend=session.get('top10_expend', []))
+                                 top10_expend=session.get('top10_expend', []),
+                                 last_two_weeks_expend=session.get('last_two_weeks_expend', []))
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
@@ -120,7 +122,8 @@ def upload():
                             pie_data=session.get('pie_data', []),
                             bar_data=session.get('bar_data', {}),
                             highest_lowest_expend=session.get('highest_lowest_expend', {}),
-                            top10_expend=session.get('top10_expend', []))
+                            top10_expend=session.get('top10_expend', []),
+                            last_two_weeks_expend=session.get('last_two_weeks_expend', []))
 
 # 账单明细
 @app.route('/details', methods=['GET'])

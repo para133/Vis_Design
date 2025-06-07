@@ -417,4 +417,37 @@ class BillDataBase:
             })
         return top10
     
+    def get_last_two_week_expend(self, user_id):
+        """
+        获取最近两周的支出数据
+        """
+        today = datetime.now()
+        two_weeks_ago_start = today - timedelta(days=13)
+        
+        bills = self.get_bills(user_id, start_date=two_weeks_ago_start, end_date=today)
+        expend_bills = [bill for bill in bills if hasattr(bill, "income_or_expense") and bill.income_or_expense == "支出"]
+        
+    def get_last_two_week_expend(self, user_id):
+        """
+        获取最近两周的支出数据，返回账单金额和对应日期
+        """
+        today = datetime.now()
+        two_weeks_ago_start = today - timedelta(days=13)
+        
+        bills = self.get_bills(user_id, start_date=two_weeks_ago_start, end_date=today)
+        expend_bills = [bill for bill in bills if hasattr(bill, "income_or_expense") and bill.income_or_expense == "支出"]
+        
+        if not expend_bills:
+            return []
+        expend_bills.sort(key=lambda bill: bill.transaction_time)
+
+        result = []
+        for bill in expend_bills:
+            result.append({
+                "消费时间": bill.transaction_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "商品名称": bill.product or "",
+                "消费金额": float(bill.amount)
+            })
+        return result
+            
     
