@@ -442,7 +442,7 @@ class BillDataBase:
                 "消费金额": float(bill.amount)
             })
         return result
-            
+    
     def get_last_half_year_expend(self, user_id):
         """
         获取最近半年每月前五类支出数据，每类每月的消费金额
@@ -484,6 +484,93 @@ class BillDataBase:
                     "分类": cat,
                     "金额": amount
                 })
+        return result
+    
+    def get_last20_weeks_expend_income(self, user_id):
+        """
+        获取最近10周（从上周开始，不含本周）的每日净收入数据（收入-支出）
+        """
+        today = datetime.now()
+        # 找到本周一
+        this_monday = today - timedelta(days=today.weekday())
+        # 上周一
+        last_monday = this_monday - timedelta(weeks=1)
+        # 20周前的周一（不含本周，含上周）
+        start_monday = last_monday - timedelta(weeks=19)
+        # 查询所有账单
+        bills = self.get_bills(user_id, start_date=start_monday, end_date=last_monday + timedelta(days=6))
+        week_days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
+
+        # 初始化数据结构
+        week_data = []
+        for week in range(20):
+            monday = last_monday - timedelta(weeks=week)
+            for i, day_name in enumerate(week_days):
+                date = monday + timedelta(days=i)
+                week_data.append({
+                    "周序": week + 1,
+                    "日期": date.strftime("%Y-%m-%d"),
+                    "星期": day_name,
+                    "收入": 0.0,
+                    "支出": 0.0
+                })
+
+        # 构建日期到记录的映射
+        date_map = {item["日期"]: item for item in week_data}
+
+        # 累加账单
+        for bill in bills:
+            date_str = bill.transaction_time.strftime("%Y-%m-%d")
+            if date_str in date_map:
+                if hasattr(bill, "income_or_expense"):
+                    if bill.income_or_expense == "支出":
+                        date_map[date_str]["支出"] += float(bill.amount)
+                    elif bill.income_or_expense == "收入":
+                        date_map[date_str]["收入"] += float(bill.amount)
+
+        # 计算净收入并保留两位小数
+        result = []
+        for item in week_data:
+            net = round(item["收入"] - item["支出"], 2)
+            result.append({
+                "周序": item["周序"],
+                "星期": item["星期"],
+                "日期": item["日期"],
+                "收支": net
+            })
+
+        # 按周序从1到20、周一到周日排序
+        result.sort(key=lambda x: (x["周序"], week_days.index(x["星期"])))
+        return result
+    
+    def get_all_year_monthly_expend_income(self, user_id):
+        """
+        获取最近一年的每月收支数据
+        """
+        today = datetime.now()
+        one_year_ago = today - timedelta(days=365)
+        
+        bills = self.get_bills(user_id, start_date=one_year_ago, end_date=today)
+        month_data = {}
+
+        for bill in bills:
+            month = bill.transaction_time.strftime("%Y-%m")
+            if month not in month_data:
+                month_data[month] = {"收入": 0.0, "支出": 0.0}
+            if hasattr(bill, "income_or_expense"):
+                if bill.income_or_expense == "支出":
+                    month_data[month]["支出"] += float(bill.amount)
+                elif bill.income_or_expense == "收入":
+                    month_data[month]["收入"] += float(bill.amount)
+
+        # 计算每月净收入
+        result = []
+        for month, data in sorted(month_data.items()):
+            result.append({
+                "月份": month,
+                "收入": round(data["收入"], 2),
+                "支出": round(data["支出"], 2),
+            })
         return result
     
     def get_sankey_data(self, user_id):

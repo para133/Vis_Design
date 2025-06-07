@@ -38,7 +38,6 @@ def refresh_user_data(user_id):
     highest_lowest_expend = billdatabase.get_highest_lowest_week_expend_income(user_id)
     top10_expend = billdatabase.get_top10_expend_bill(user_id)
     last_two_weeks_expend = billdatabase.get_last_two_week_expend(user_id)
-    last_half_year_expend = billdatabase.get_last_half_year_expend(user_id)
     # 存到 session
     session['total_expend'] = total_expend
     session['total_income'] = total_income
@@ -55,25 +54,7 @@ def refresh_user_data(user_id):
     session['highest_lowest_expend'] = highest_lowest_expend
     session['top10_expend'] = top10_expend
     session['last_two_weeks_expend'] = last_two_weeks_expend
-    session['last_half_year_expend'] = last_half_year_expend
-def get_sankey_data():
-    return billdatabase.get_sankey_data(session['user_id'])
-
-@app.route("/expend_income", methods=['GET'])
-
-def chart_columnar():
-    '''
-    消费支收图
-    '''
-    sankey_data = billdatabase.get_sankey_data(session['user_id'])
-    print(sankey_data)
     
-    return render_template('expend_income.html',username=get_username(),
-                           last_half_year_expend=session.get('last_half_year_expend', []),
-                           sankey_data=get_sankey_data())
-
-
-
 # 首页路由
 @app.route('/')
 def index():
@@ -191,7 +172,20 @@ def login():
             
     return render_template('login.html')
 
-
+@app.route("/expend_income", methods=['GET'])
+def expend_income():
+    '''
+    消费支收图
+    '''
+    last_half_year_expend = billdatabase.get_last_half_year_expend(session['user_id'])
+    last20_weeks_expend_income = billdatabase.get_last20_weeks_expend_income(session['user_id'])
+    sankey_data = billdatabase.get_sankey_data(session['user_id'])
+    all_year_monthly_expend_income = billdatabase.get_all_year_monthly_expend_income(session['user_id'])
+    return render_template('expend_income.html',username=get_username(),
+                           last_half_year_expend=last_half_year_expend,
+                           last20_weeks_expend_income=last20_weeks_expend_income,
+                           sankey_data=sankey_data,
+                           all_year_monthly_expend_income=all_year_monthly_expend_income)
 
 @app.route('/logout')
 def logout():
