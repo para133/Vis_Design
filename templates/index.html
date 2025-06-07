@@ -13,77 +13,101 @@
 			</div>
 		</header>
 
+        <div class="content-page">
+            <!-- Start content -->
+            <div class="content">
+                <div class="am-g">
+                    <!-- 总支出 -->
+                    <div class="am-u-md-2">
+                    <div class="card-box" style="height: 180px;">
+                        <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">总支出</h4>
+                        <div class="widget-chart-1 am-cf" style="display: flex; align-items: center;">
+                        <div id="widget-chart-box-1" style="height: 110px;width: 110px; margin-right: 10px;">
+                        </div>
+                        <div class="widget-detail-1" style="flex: 1;">
+                            <h1 class="m-b-0" style="font-size: 28px;">{{ total_expend }}</h1>
+                            <p class="text-muted" style="font-size: 16px;">总支出金额</p>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
 
-
-		<div class="content-page">
-			<!-- Start content -->
-			<div class="content">
-				<div class="am-g">
-					<!-- Row start -->
-						<div class="am-u-md-3">
-							<div class="card-box">
-								<h4 class="header-title m-t-0 m-b-30">总支出</h4>
-								<div class="widget-chart-1 am-cf">
-                                    <div id="widget-chart-box-1" style="height: 110px;width: 110px;float: left;">
-                                    </div>
-
-                                    <div class="widget-detail-1" style="float: right;">
-                                        <h2 class="p-t-10 m-b-0"> {{ total_expend }} </h2>
-                                        <p class="text-muted">总支出金额</p>
-                                    </div>
+                    <!-- 单笔最高支出 -->
+                    <div class="am-u-md-2">
+                        <div class="card-box" style="height: 180px;">
+                            <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">单笔最高支出</h4>
+                            <div class="widget-box-2">
+                                <div class="widget-detail-2">
+                                    <span class="badge pull-left m-t-20 am-round" style="color: #fff; background: #0e90d2;">{{ zcyl_dbzgzcbfb }} <i class="zmdi zmdi-trending-up"></i></span>
+                                    <h1 class="m-b-0" style="font-size: 28px;"> {{ m_expend.交易金额 }} </h1>
                                 </div>
-							</div>
-						</div>
-						<!-- col end -->
-						<div class="am-u-md-3">
-							<div class="card-box">
-								<h4 class="header-title m-t-0 m-b-30">单笔最高支出</h4>
-								<div class="widget-box-2">
-                                    <div class="widget-detail-2">
-                                        <span class="badge  pull-left m-t-20  am-round" style="color: #fff; background: #0e90d2;">{{ zcyl_dbzgzcbfb }} <i class="zmdi zmdi-trending-up"></i> </span>
-                                        <h2 class="m-b-0"> {{ m_expend }} </h2>
-
-                                    </div>
-                                    <div class="am-progress am-progress-xs am-margin-bottom-0">
-                                        <!-- {{ expend_percent }} -->
-									    <div class="am-progress-bar" style="width: {{ expend_percent }}%"></div>
-									</div>
+                                <div class="am-progress am-progress-xs am-margin-bottom-0">
+                                    <div class="am-progress-bar" style="width: {{ expend_percent }}%"></div>
                                 </div>
-							</div>
-						</div>
-						<!-- col end -->
-						<div class="am-u-md-3">
-							<div class="card-box">
-								<h4 class="header-title m-t-0 m-b-30">总收入</h4>
-								<div class="widget-chart-1 am-cf">
-                                    <div id="widget-chart-box-2" style="height: 110px;width: 110px;float: left;">
-                                    </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <div class="widget-detail-1" style="float: right;">
-                                        <h2 class="p-t-10 m-b-0"> {{ total_income }} </h2>
-                                        <p class="text-muted">总收入金额</p>
-                                    </div>
-                                </div>
-							</div>
-						</div>
-						<!-- col end -->
-						<div class="am-u-md-3">
-							<div class="card-box">
-								<h4 class="header-title m-t-0 m-b-30">单笔最高收入</h4>
-								<div class="widget-box-2">
-                                    <div class="widget-detail-2">
-                                        <span class="badge  pull-left m-t-20  am-round progress-bar-pink" style="color: #fff;">{{ zcyl_dbzgsrbfb }} <i class="zmdi zmdi-trending-up"></i> </span>
-                                        <h2 class="m-b-0"> {{ m_income }} </h2>
+                    <!-- 总收入 -->
+                    <div class="am-u-md-2">
+                    <div class="card-box" style="height: 180px;">
+                        <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">总收入</h4>
+                        <div class="widget-chart-1 am-cf" style="display: flex; align-items: center;">
+                        <div id="widget-chart-box-2" style="height: 110px;width: 110px; margin-right: 10px;">
+                        </div>
+                        <div class="widget-detail-1" style="flex: 1;">
+                            <h1 class="m-b-0" style="font-size: 28px;">{{ total_income }}</h1>
+                            <p class="text-muted" style="font-size: 16px;">总收入金额</p>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
 
-                                    </div>
-                                    <div class="am-progress am-progress-xs am-margin-bottom-0" style="background: rgba(255, 138, 204, 0.2);">
-									    <div class="am-progress-bar progress-bar-pink" style="width: {{ income_percent }}%"></div>
-									</div>
+                    <!-- 单笔最高收入 -->
+                    <div class="am-u-md-2">
+                        <div class="card-box" style="height: 180px;">
+                            <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">单笔最高收入</h4>
+                            <div class="widget-box-2">
+                                <div class="widget-detail-2">
+                                    <span class="badge pull-left m-t-20 am-round progress-bar-pink" style="color: #fff;">{{ zcyl_dbzgsrbfb }} <i class="zmdi zmdi-trending-up"></i></span>
+                                    <h1 class="m-b-0" style="font-size: 28px;"> {{ m_income.交易金额 }} </h1>
                                 </div>
-							</div>
-						</div>
-					<!-- Row end -->
-				</div>
+                                <div class="am-progress am-progress-xs am-margin-bottom-0" style="background: rgba(255, 138, 204, 0.2);">
+                                    <div class="am-progress-bar progress-bar-pink" style="width: {{ income_percent }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <!-- 右侧新栏 (上下两个卡片) -->
+                    <div class="am-u-md-4">
+                        <!-- 最高支出账单详情 -->
+                        <div class="card-box" style="height: 85px; margin-bottom: 10px;">
+                            <p>
+                            <strong>笨蛋！</strong>你居然为了 
+                            <span style="color: #1eb3e9e9; font-weight: bold"> {{ m_expend.商品名称 }} </span> 
+                            <span >付了</span>
+                            <span style="color: #3f51b5; text-decoration: underline"> {{ m_expend.对方名称 }} </span> 
+                            <span style="color: #bd1229; font-size: 1.1em"><strong> {{ m_expend.交易金额 }}元💸 </strong></span> 
+                            <span style="font-size: 0.8em"><strong>略略略～</strong></span>
+                            </p>
+                        </div>
+                        <!-- 最高收入账单详情 -->
+                        <div class="card-box" style="height: 85px;">
+                            <p>
+                            <strong>嘻嘻~</strong>
+                            </strong>你这<strong>杂鱼</strong>通过
+                            <span style="color: #1eb3e9e9; font-weight: bold"> {{ m_income.商品名称 }} </span>
+                            <span>从</span>
+                            <span style="color: #3f51b5; text-decoration: underline"> {{ m_income.对方名称 }} </span> 
+                            <span>抠到</span>
+                            <span style="color: #bd1229; font-weight: 800; text-shadow: 0 0 2px pink"> {{ m_income.交易金额 }}元💰</span> 
+                            <strong>，哼！</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
 				
 				<div class="am-g">
 					<!-- Row start -->
@@ -92,10 +116,11 @@
 							<h4 class="header-title m-t-0">消费分类</h4>
 
                             <!-- 消费分类饼图 input: pie_data [{'value':v,'name':k},...] -->
-							<div id="index-pie-1" style="height: 345px;height: 300px;"></div>
+							<div id="index-pie-1" style="height: 345px;"></div>
   
                             <div id="pie_data" data-json='{{ pie_data|tojson }}'></div>
-                            <script>
+                            <div>
+                                <script>
                                 var myChart = echarts.init(document.getElementById("index-pie-1"));
                                 var pie_data = JSON.parse(document.getElementById("pie_data").dataset.json);
 
@@ -178,6 +203,7 @@
                                 };
                             myChart.setOption(option);
                             </script>
+                            </div>
 						</div>
 					</div>
 					
@@ -190,7 +216,8 @@
                             <!-- 用于存储 bar_data -->
                             <div id="bar_data" data-json='{{ bar_data|tojson }}' style="display: none;"></div>
 
-                            <script>
+                            <div>
+                                <script>
                                 var barData = JSON.parse(document.getElementById("bar_data").getAttribute("data-json"));
                                 var xData = barData.date;    // x 轴为日期
                                 var yData = barData.counts;  // y 轴为消费总金额
@@ -251,165 +278,282 @@
                                 // 使用刚指定的配置项和数据显示图表
                                 myChart.setOption(option);
                             </script>
+                            </div>
                         </div>
                     </div>
 					
-					<div class="am-u-md-4">
-						<div class="card-box">
-							<h4 class="header-title m-t-0">两周高低消费对比</h4>
+                    <div class="am-u-md-4">
+                        <div class="card-box">
+                            <h4 class="header-title m-t-0">两周高低消费对比</h4>
                             <!-- 两周高低消费对比折线图 -->
-							<div id="index-line-1" style="height: 345px;height: 300px;"></div>
-						</div>
-					</div>
+                            <div id="index-line-1" style="height: 345px;"></div>
+
+                            <!-- 在这里放 hidden div 用于传递 JSON 数据 -->
+                            <div id="highest_lowest_expend" data-json='{{ highest_lowest_expend|tojson }}'></div>
+
+                            <div>
+                                <script>
+                                // 读取数据
+                                var expendData = JSON.parse(document.getElementById("highest_lowest_expend").getAttribute("data-json"));
+
+                                // 最高一周和最低一周每天的消费金额
+                                var highestData = [];
+                                var lowestData = [];
+
+                                if (expendData.highest && expendData.highest.days) {
+                                    highestData = [
+                                        expendData.highest.days['周一'] || 0,
+                                        expendData.highest.days['周二'] || 0,
+                                        expendData.highest.days['周三'] || 0,
+                                        expendData.highest.days['周四'] || 0,
+                                        expendData.highest.days['周五'] || 0,
+                                        expendData.highest.days['周六'] || 0,
+                                        expendData.highest.days['周日'] || 0
+                                    ];
+                                }
+
+                                if (expendData.lowest && expendData.lowest.days) {
+                                    lowestData = [
+                                        expendData.lowest.days['周一'] || 0,
+                                        expendData.lowest.days['周二'] || 0,
+                                        expendData.lowest.days['周三'] || 0,
+                                        expendData.lowest.days['周四'] || 0,
+                                        expendData.lowest.days['周五'] || 0,
+                                        expendData.lowest.days['周六'] || 0,
+                                        expendData.lowest.days['周日'] || 0
+                                    ];
+                                }
+
+                                // 初始化图表
+                                var myChart = echarts.init(document.getElementById("index-line-1"));
+
+                                var option = {
+                                    tooltip: {
+                                        trigger: 'axis'
+                                    },
+                                    legend: {
+                                        data: ['消费最高一周', '消费最低一周'],
+                                        right: 10  // 放到右上角
+                                    },
+                                    xAxis: {
+                                        type: 'category',
+                                        boundaryGap: false,
+                                        data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                                    },
+                                    yAxis: {
+                                        type: 'value',
+                                        axisLabel: {
+                                            formatter: '{value} ￥'
+                                        }
+                                    },
+                                    series: [
+                                        {
+                                            name: '消费最高一周',
+                                            type: 'line',
+                                            data: highestData,
+                                            markPoint: {
+                                                data: [
+                                                    {type: 'max', name: '最大值'},
+                                                    {type: 'min', name: '最小值'}
+                                                ]
+                                            },
+                                            markLine: {
+                                                data: [
+                                                    {type: 'average', name: '平均值'}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            name: '消费最低一周',
+                                            type: 'line',
+                                            data: lowestData,
+                                            markPoint: {
+                                                data: [
+                                                    {type: 'max', name: '最大值'},
+                                                    {type: 'min', name: '最小值'}
+                                                ]
+                                            },
+                                            markLine: {
+                                                data: [
+                                                    {type: 'average', name: '平均值'}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                };
+                                myChart.setOption(option);
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+
 					<!-- Row end -->
 				</div>
 				
 				<div class="am-g">
-
-					</div>
-					
+					</div> 
 					
 					<!-- Row start -->
 					<div class="am-g">
 						<!-- col start -->
-						<div class="am-u-md-4">
-							<div class="card-box">
-								<h4 class="header-title m-t-0 m-b-30">消费活跃区域</h4>
-                                <!-- 消费活跃区域视图 -->
-								<div class="inbox-widget nicescroll" style="height: 315px; overflow: hidden; outline: none;" tabindex="5000">
+                        <!-- 近两周消费分布卡片 -->
+                        <div class="am-u-md-4">
+                            <div class="card-box">
+                                <h4 class="header-title m-t-0 m-b-30">近两周消费分布</h4>
+                                    <div id="expend-scatter-chart" style="height: 345px;"></div>
 
+                                    <!-- hidden div 传递数据 -->
+                                    <div id="last_two_weeks_expend" data-json='{{ last_two_weeks_expend|tojson }}'></div>
+                                    <div>
+                                        <script>
+                                        var expendData = JSON.parse(document.getElementById("last_two_weeks_expend").getAttribute("data-json"));
 
-                                    <!--<a href="#">
-                                        <div class="inbox-item">
-                                            <div class="inbox-item-img"><img src="../static/img/city.png" class="img-circle" alt=""></div>
-                                            <p class="inbox-item-author">北京</p>
-                                            <p class="inbox-item-text">WECOME TO CITY</p>
-                                            <p class="inbox-item-date">13:40 PM</p>
-                                        </div>
-                                    </a>-->
+                                        // 提取所有金额，升序排序
+                                        var amounts = expendData.map(item => item["消费金额"]).sort((a, b) => a - b);
 
+                                        // 计算 90 分位数作为 y 轴最大值
+                                        var index_90 = Math.floor(0.9 * amounts.length);
+                                        var maxAmount = amounts[index_90] || 0;
+                                        if (maxAmount === 0) {
+                                            maxAmount = 200; // 没有数据时默认最大值
+                                        }
 
-                                    {% for i in xfcity %}
+                                        // 处理数据：超过最大值的，显示在最大值位置
+                                        var dataPoints = expendData.map(function(item) {
+                                            var displayAmount = item["消费金额"] > maxAmount ? maxAmount : item["消费金额"];
+                                            return [item["消费时间"], displayAmount, item["消费金额"], item["商品名称"]];
+                                        });
 
-                                        <a href="#">
-                                            <div class="inbox-item">
-                                                <div class="inbox-item-img"><img src="../static/img/city.png" class="img-circle" alt=""></div>
-                                                <p class="inbox-item-author">{{ i }}</p>
-                                                <p class="inbox-item-text">WELCOME TO THIS CITY</p>
-                                                <p class="inbox-item-date">12:00 PM</p>
-                                            </div>
-                                         </a>
+                                        // 初始化 ECharts 实例
+                                        var myChart = echarts.init(document.getElementById('expend-scatter-chart'));
 
-                                    {% endfor %}
+                                        // 配置项
+                                        var option = {
+                                            tooltip: {
+                                                trigger: 'item',
+                                                formatter: function(params) {
+                                                    var actualAmount = params.data[2];
+                                                    var shownAmount = params.data[1];
+                                                    var amountText = actualAmount > maxAmount ? actualAmount : shownAmount;
 
+                                                    // 商品名称最多显示 10 个字，后面加“……”
+                                                    var productName = params.data[3];
+                                                    var shownProductName = productName.length > 10 ? productName.substring(0, 10) + '……' : productName;
+
+                                                    return '消费时间: ' + params.data[0] +
+                                                        '<br/>商品名称: ' + shownProductName +
+                                                        '<br/>消费金额: ' + amountText;
+                                                }
+                                            },
+                                            xAxis: {
+                                                type: 'category',
+                                                name: '消费时间',
+                                                nameLocation: 'middle',
+                                                nameGap: 25,
+                                                data: expendData.map(item => item["消费时间"]),
+                                                axisLabel: {
+                                                    interval: 3, // 每 4 天显示一个 label
+                                                    formatter: function(value) {
+                                                        var date = new Date(value);
+                                                        return (date.getMonth() + 1) + '/' + date.getDate();
+                                                    }
+                                                }
+                                            },
+                                            yAxis: {
+                                                type: 'value',
+                                                name: '消费金额',
+                                                nameLocation: 'middle',
+                                                nameGap: 35,
+                                                min: 0,
+                                                max: maxAmount,
+                                                axisLabel: {
+                                                    formatter: function (value) {
+                                                        // 若是最大值，在末尾加 "+"
+                                                        return value === maxAmount ? value + '+' : value;
+                                                    }
+                                                }
+                                            },
+                                            series: [{
+                                                symbolSize: 10,
+                                                data: dataPoints,
+                                                type: 'scatter',
+                                                itemStyle: {
+                                                    color: '#ff5722'
+                                                }
+                                            }]
+                                        };
+
+                                        // 渲染图表
+                                        myChart.setOption(option);
+
+                                        // 响应式处理
+                                        window.addEventListener('resize', function() {
+                                            myChart.resize();
+                                        });
+                                        </script>
                                 </div>
-							</div>
-						</div>
+                            </div>
+                        </div>
 						<!-- col end -->
-						
 
                         <!-- 消费清单部分 -->
 						<!-- col start -->
 						<div class="am-u-md-8">
-							<div class="card-box">
-								<h4 class="header-title m-t-0 m-b-30">TOP10 消费清单</h4>
-								<div class="am-scrollable-horizontal am-text-ms" style="font-family: '微软雅黑';">
-                                        <table class="am-table   am-text-nowrap">
-                                            <thead>
+                            <div class="card-box" >
+                                <h4 class="header-title m-t-0 m-b-30">TOP10 消费清单</h4>
+                                <div class="am-scrollable-horizontal am-text-ms" style="font-family: '微软雅黑'; height: 360px;">
+                                    <table class="am-table am-text-nowrap">
+                                        <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>商品名称</th>
+                                            <th>商品金额</th>
+                                            <th>交易时间</th>
+                                            <th>交易状态</th>
+                                            <th>支付方式</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        {% for item in top10_expend %}
                                             <tr>
-                                                <th>#</th>
-                                                <th>商品名称</th>
-                                                <th>商品金额</th>
-                                                <th>交易时间</th>
-                                                <th>交易状态</th>
-                                                <th>支付方式</th>
+                                                <td>{{ item.序号 }}</td>
+                                                <td>
+                                                    <div style="
+                                                        max-width: 200px;       /* 设置最大宽度 */
+                                                        overflow: hidden;       /* 超出隐藏 */
+                                                        white-space: nowrap;    /* 不换行 */
+                                                        text-overflow: ellipsis;/* 超出部分显示省略号 */
+                                                    ">
+                                                        {{ item.商品名称 }}
+                                                    </div>
+                                                </td>
+                                                <td>{{ item.交易金额 }}</td>
+                                                <td>{{ item.交易时间 }}</td>
+                                                <td>
+                                                    <span class="label 
+                                                    {% if item.交易状态 == '交易成功' %}
+                                                        label-success
+                                                    {% elif item.交易状态 == '交易关闭' %}
+                                                        label-danger
+                                                    {% else %}
+                                                        label-default
+                                                    {% endif %}
+                                                    ">{{ item.交易状态 }}</span>
+                                                </td>
+                                                <td>{{ item.支付方式 }}</td>
                                             </tr>
-                                            </thead>
-                                            <tbody>
+                                        {% endfor %}
 
-
-                                               <!-- <tr>
-                                                    <td>1</td>
-                                                    <td>Adminto Admin v1</td>
-                                                    <td>01/01/2016</td>
-                                                    <td>26/04/2016</td>
-                                                    <td><span class="label label-success">已发布</span></td>
-                                                    <td>Coderthemes</td>
-                                                </tr> -->
-
-                                                {% for i in zcyl_xftop10 %}
-
-                                                    <tr>
-                                                        <td>{{ i[0] }}</td>
-                                                        <td>{{ i[1] }}</td>
-                                                        <td>{{ i[2] }}</td>
-                                                        <td>{{ i[3] }}</td>
-                                                        <td><span class="label label-success">{{ i[4] }}</span></td>
-                                                        <td>{{ i[5] }}</td>
-                                                    </tr>
-
-                                                {% endfor %}
-
-
-                                                <!--<tr>
-                                                    <td>2</td>
-                                                    <td>Adminto Frontend v1</td>
-                                                    <td>01/01/2016</td>
-                                                    <td>26/04/2016</td>
-                                                    <td><span class="label label-success">已发布</span></td>
-                                                    <td>Adminto admin</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>3</td>
-                                                    <td>Adminto Admin v1.1</td>
-                                                    <td>01/05/2016</td>
-                                                    <td>10/05/2016</td>
-                                                    <td><span class="label label-pink">未开展</span></td>
-                                                    <td>Coderthemes</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>4</td>
-                                                    <td>Adminto Frontend v1.1</td>
-                                                    <td>01/01/2016</td>
-                                                    <td>31/05/2016</td>
-                                                    <td><span class="label label-purple">进行中</span>
-                                                    </td>
-                                                    <td>Adminto admin</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>5</td>
-                                                    <td>Adminto Admin v1.3</td>
-                                                    <td>01/01/2016</td>
-                                                    <td>31/05/2016</td>
-                                                    <td><span class="label label-warning">即将开始</span></td>
-                                                    <td>Coderthemes</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>6</td>
-                                                    <td>Adminto Admin v1.3</td>
-                                                    <td>01/01/2016</td>
-                                                    <td>31/05/2016</td>
-                                                    <td><span class="label label-primary">即将开始</span></td>
-                                                    <td>Adminto admin</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>7</td>
-                                                    <td>Adminto Admin v1.3</td>
-                                                    <td>01/01/2016</td>
-                                                    <td>31/05/2016</td>
-                                                    <td><span class="label label-primary">即将开始</span></td>
-                                                    <td>Adminto admin</td>
-                                                </tr>-->
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-							</div>
-						</div>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
 						<!-- col end -->
-					</div>
-
-			</div>
+                    </div>
+			
+                </div>
 		</div>
 
 
