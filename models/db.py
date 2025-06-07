@@ -494,38 +494,38 @@ class BillDataBase:
         if not bills:
             return {"nodes": [], "links": []}
         links = []
-        temp_links = set()
+
         for bill in bills:
             if not hasattr(bill, "income_or_expense"):
                 continue
             # 来源节点
             if bill.income_or_expense == "收入":
-                source = bill.counterparty or "其他收入"
+                if bill.counterparty == "/":
+                    source = "其他收入"
+                else:
+                    source = bill.counterparty or "其他收入"
                 target = "账户"
                 type = "income"
             elif bill.income_or_expense == "支出":
                 source = "账户"
-                target = (bill.category or "其他支出")
+                if bill.counterparty == "/":
+                    target = "其他支出"
+                else:
+                    target = (bill.category or "其他支出")
                 type = "expense"
             else:
                 continue
 
-            if (source, target, type) in temp_links:
-                # 如果已存在该link，则累加value
-                for link in links:
-                    if link["source"] == source and link["target"] == target and link["type"] == type:
-                        link["value"] += round(bill.amount, 2)
-                        break
-            else:
-                temp_links.add((source, target, type))
-                links.append({
-                    "source": source,
-                    "target": target,
-                    "value": round(bill.amount, 2),
-                    "type": type
-                })
+            links.append({
+                "source": source,
+                "target": target,
+                "value": round(bill.amount, 2),
+                "type": type
+            })
                 
-        # 累加后还是较小的节点合并
+        # 累加相同的 source、target、type 的 links
+        links = merge_links(links)
+        # 处理小额交易
         for link in links:
             if link["type"] == "expense" and link["value"] < 100:
                 link["target"] = "其他"
