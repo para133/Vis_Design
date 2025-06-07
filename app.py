@@ -6,9 +6,10 @@ from flask import Flask, request, render_template,redirect, url_for,session, jso
 from models.data import db
 from models.db import BillDataBase
 from utils import AIClient
+import markdown
 
 app = Flask(__name__)
-app.secret_key = 'b3f8e7c4a1d2e9f0b6c7d8e9f1a2b3c4d5e6f7a8b9c0d1e2'  
+app.secret_key = 'jasd0isdoashdfaun0*@#&B*Babi9aubd'  
 
 # 数据库配置
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -56,10 +57,9 @@ def ai_summary_stream():
     year_report_data = billdatabase.get_year_report_data(session['user_id'])
     # print(year_report_data)
     def generate():
-        client = AIClient(api_key="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")
+        client = AIClient(api_key="sk-3b4a3912e8584a0f8c38922f11e6f15e")
         for chunk in client.generate_summary_stream(user_id=session['user_id'], year_report_data=year_report_data):
             yield f"data: {chunk}\n\n"  # SSE格式
-            
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 @app.route('/report')
