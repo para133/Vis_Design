@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request, render_template,redirect, url_for,session, jsonify
+from flask import Flask, request, render_template,redirect, url_for,session, jsonify,stream_with_context,Response
 
 from models.data import db
 from models.db import BillDataBase
+from utils import AIClient
 
 app = Flask(__name__)
 app.secret_key = 'b3f8e7c4a1d2e9f0b6c7d8e9f1a2b3c4d5e6f7a8b9c0d1e2'  
@@ -48,24 +49,24 @@ def refresh_user_data(user_id):
 
     
     
-def ai_generate_summary():
-    # 这里可以调用OpenAI、百度文心一言等API
-    # 例如：return openai_api_call(...)
-    return "本年度您的账单收支总体平稳，消费主要集中在餐饮、日用百货等类别……"
 
 
-@app.route('/api/ai_summary')
-def ai_summary():
-    # 这里调用你的AI接口，返回字符串
-    summary = ai_generate_summary()  # 你需要实现这个函数
-    return jsonify({'summary': summary})
+@app.route('/api/ai_summary_stream')
+def ai_summary_stream():
+    year_report_data = billdatabase.get_year_report_data(session['user_id'])
+    # print(year_report_data)
+    def generate():
+        client = AIClient(api_key="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")
+        for chunk in client.generate_summary_stream(user_id=session['user_id'], year_report_data=year_report_data):
+            yield f"data: {chunk}\n\n"  # SSE格式
+            
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 @app.route('/report')
 def report():
     """
     渲染报表页面
     """
-
     return render_template('report.html', username=get_username())
     
 # 首页路由

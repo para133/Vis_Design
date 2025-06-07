@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+		<script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
+
+
 
 <!-- Begin page -->
 <header class="am-topbar am-topbar-fixed-top">
@@ -42,19 +45,22 @@
                                     var btn = this;
                                     btn.disabled = true;
                                     btn.innerText = '生成中...';
-                                    document.getElementById('ai-summary').innerText = 'AI正在生成总结，请稍候...';
-                                    fetch('/api/ai_summary')
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            document.getElementById('ai-summary').innerText = data.summary;
-                                            btn.disabled = false;
-                                            btn.innerText = '重新生成AI总结';
-                                        })
-                                        .catch(err => {
-                                            document.getElementById('ai-summary').innerText = 'AI报告生成失败，请稍后重试。';
-                                            btn.disabled = false;
-                                            btn.innerText = '生成AI总结';
-                                        });
+                                    var summaryDiv = document.getElementById('ai-summary');
+                                    summaryDiv.innerText = '';
+                                    var markdownContent = '';
+
+                                    var es = new EventSource('/api/ai_summary_stream');
+                                    es.onmessage = function(e) {
+
+                                        markdownContent += e.data;
+                                        summaryDiv.innerHTML = marked.parse(markdownContent); // 使用marked.js将Markdown转换为HTML
+                                    
+                                    };
+                                    es.onerror = function() {
+                                        es.close();
+                                        btn.disabled = false;
+                                        btn.innerText = '生成AI总结';
+                                    };
                                 };
                             </script>
                         </div>
