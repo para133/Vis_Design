@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Begin page -->
+<header class="am-topbar am-topbar-fixed-top">
+    <div class="am-topbar-left am-hide-sm-only">
+        <img src="../static/img/title.png" alt="BillAnalysis Logo" style="height:60px;">
+    </div>
+
+    <div class="contain">
+        <ul class="am-nav am-navbar-nav am-navbar-left">
+            <li><h4 class="page-title">消费支收图</h4></li>
+        </ul>
+    </div>
+</header>
+<!-- end page -->
+
+<!-- start page -->
+<div class="content-page">
+    <!-- start content -->
+    <div class="content">
+
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card shadow border-primary mb-4">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h3 class="mb-0">年度账单总结报告</h3>
+                            <small>Yearly Invoice Summary</small>
+                        </div>
+                        <div class="card-body" style="background: repeating-linear-gradient(135deg, #f8f9fa, #f8f9fa 30px, #e9ecef 30px, #e9ecef 60px);">
+                            <div class="card-body" style="background: repeating-linear-gradient(135deg, #f8f9fa, #f8f9fa 30px, #e9ecef 30px, #e9ecef 60px);">
+                                <!-- 添加生成按钮 -->
+                                <button id="gen-ai-summary" class="btn btn-primary mb-3">生成AI总结</button>
+                                <!-- 主体部分：AI生成总结报告 -->
+                                <div id="ai-summary" class="py-4 px-2" style="min-height: 200px;">
+                                    <!-- 这里将由AI生成年度账单总结报告内容 -->
+                                </div>
+                            </div>
+                            <script>
+                                document.getElementById('gen-ai-summary').onclick = function() {
+                                    var btn = this;
+                                    btn.disabled = true;
+                                    btn.innerText = '生成中...';
+                                    document.getElementById('ai-summary').innerText = 'AI正在生成总结，请稍候...';
+                                    fetch('/api/ai_summary')
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            document.getElementById('ai-summary').innerText = data.summary;
+                                            btn.disabled = false;
+                                            btn.innerText = '重新生成AI总结';
+                                        })
+                                        .catch(err => {
+                                            document.getElementById('ai-summary').innerText = 'AI报告生成失败，请稍后重试。';
+                                            btn.disabled = false;
+                                            btn.innerText = '生成AI总结';
+                                        });
+                                };
+                            </script>
+                        </div>
+                        <div class="card-footer text-end bg-light">
+                            <span class="text-muted">账单日期：<span id="current-date"></span></span>
+                            <script>
+                                document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+    </div>
+    <!-- end content -->
+</div>
+<!-- end page -->
+
+
+{% endblock %}
+

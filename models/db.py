@@ -643,3 +643,62 @@ def merge_links(links):
         else:
             merged[key]['value'] += link['value']
     return list(merged.values())
+
+def get_year_report_data(self, user_id, year):
+    """
+    获取指定年份的年度报告数据，适合AI生成总结
+    """
+    start_date = datetime(year, 1, 1)
+    end_date = datetime(year, 12, 31, 23, 59, 59)
+
+    # 总收入、总支出
+    total_income = self.get_total_income(user_id, start_date, end_date)
+    total_expend = self.get_total_expend(user_id, start_date, end_date)
+
+    # 月度收支
+    bills = self.get_bills(user_id, start_date, end_date)
+    month_data = {}
+    for bill in bills:
+        month = bill.transaction_time.strftime("%Y-%m")
+        if month not in month_data:
+            month_data[month] = {"收入": 0.0, "支出": 0.0}
+        if hasattr(bill, "income_or_expense"):
+            if bill.income_or_expense == "支出":
+                month_data[month]["支出"] += float(bill.amount)
+            elif bill.income_or_expense == "收入":
+                month_data[month]["收入"] += float(bill.amount)
+    monthly = []
+    for month, data in sorted(month_data.items()):
+        monthly.append({
+            "月份": month,
+            "收入": round(data["收入"], 2),
+            "支出": round(data["支出"], 2),
+        })
+
+    # 分类支出
+    expend_class = self.get_expend_classification_pie_data(user_id, start_date, end_date)
+
+    # 最大支出/收入账单
+    max_expend = self.get_highest_expend_bill(user_id)
+    max_income = self.get_highest_income_bill(user_id)
+
+    # 最高/最低消费周
+    week_stat = self.get_highest_lowest_week_expend_income(user_id)
+    highest_week = week_stat.get("highest", {})
+    lowest_week = week_stat.get("lowest", {})
+
+    # 支出前10账单
+    top10_expend = self.get_top10_expend_bill(user_id)
+
+    return {
+        "总收入": total_income,
+        "总支出": total_expend,
+        "月度收支": monthly,
+        "分类支出": expend_class,
+        "最大支出账单": max_expend,
+        "最大收入账单": max_income,
+        "最高消费周": highest_week,
+        "最低消费周": lowest_week,
+        "支出前10账单": top10_expend
+    }
+    

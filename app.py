@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request, render_template,redirect, url_for,session
+from flask import Flask, request, render_template,redirect, url_for,session, jsonify
 
 from models.data import db
 from models.db import BillDataBase
@@ -34,10 +34,6 @@ def refresh_user_data(user_id):
     total_income = billdatabase.get_total_income(user_id)
     m_expend = billdatabase.get_highest_expend_bill(user_id)
     m_income = billdatabase.get_highest_income_bill(user_id)
-    pie_data = billdatabase.get_expend_classification_pie_data(user_id)
-    highest_lowest_expend = billdatabase.get_highest_lowest_week_expend_income(user_id)
-    top10_expend = billdatabase.get_top10_expend_bill(user_id)
-    last_two_weeks_expend = billdatabase.get_last_two_week_expend(user_id)
     # 存到 session
     session['total_expend'] = total_expend
     session['total_income'] = total_income
@@ -49,11 +45,28 @@ def refresh_user_data(user_id):
         session['expend_percent'] = float(m_expend["交易金额"]) / float(total_expend) * 100
     if float(total_income) != 0:
         session['income_percent'] = float(m_income["交易金额"]) / float(total_income) * 100
-    session['pie_data'] = pie_data
-    session['bar_data'] = billdatabase.get_last_week_expend_bar_data(user_id)
-    session['highest_lowest_expend'] = highest_lowest_expend
-    session['top10_expend'] = top10_expend
-    session['last_two_weeks_expend'] = last_two_weeks_expend
+
+    
+    
+def ai_generate_summary():
+    # 这里可以调用OpenAI、百度文心一言等API
+    # 例如：return openai_api_call(...)
+    return "本年度您的账单收支总体平稳，消费主要集中在餐饮、日用百货等类别……"
+
+
+@app.route('/api/ai_summary')
+def ai_summary():
+    # 这里调用你的AI接口，返回字符串
+    summary = ai_generate_summary()  # 你需要实现这个函数
+    return jsonify({'summary': summary})
+
+@app.route('/report')
+def report():
+    """
+    渲染报表页面
+    """
+
+    return render_template('report.html', username=get_username())
     
 # 首页路由
 @app.route('/')
@@ -76,11 +89,11 @@ def index():
                                  m_income=session.get('m_income', {}),
                                  expend_percent=session.get('expend_percent', 0),
                                  income_percent=session.get('income_percent', 0),
-                                 pie_data=session.get('pie_data', []),
-                                 bar_data=session.get('bar_data', []),
-                                 highest_lowest_expend=session.get('highest_lowest_expend', {}),
-                                 top10_expend=session.get('top10_expend', []),
-                                 last_two_weeks_expend=session.get('last_two_weeks_expend', []))
+                                 pie_data=billdatabase.get_expend_classification_pie_data(session['user_id']),
+                                 bar_data=billdatabase.get_last_week_expend_bar_data(session['user_id']),
+                                 highest_lowest_expend=billdatabase.get_highest_lowest_week_expend_income(session['user_id']),
+                                 top10_expend=billdatabase.get_top10_expend_bill(session['user_id']),
+                                 last_two_weeks_expend=billdatabase.get_last_two_week_expend(session['user_id']))
 
 # 上传数据文件
 @app.route('/upload', methods=['POST'])
@@ -109,17 +122,17 @@ def upload():
             # 刷新用户数据
             refresh_user_data(session['user_id'])
     return render_template('index.html', username=get_username(),message=message, message_type=message_type,
-                            total_expend=session.get('total_expend', 0),
-                            total_income=session.get('total_income', 0),
-                            m_expend=session.get('m_expend', {}),
-                            m_income=session.get('m_income', {}),
-                            expend_percent=session.get('expend_percent', 0),
-                            income_percent=session.get('income_percent', 0),
-                            pie_data=session.get('pie_data', []),
-                            bar_data=session.get('bar_data', {}),
-                            highest_lowest_expend=session.get('highest_lowest_expend', {}),
-                            top10_expend=session.get('top10_expend', []),
-                            last_two_weeks_expend=session.get('last_two_weeks_expend', []))
+                                 total_expend=session.get('total_expend', 0),
+                                 total_income=session.get('total_income', 0),
+                                 m_expend=session.get('m_expend', {}),
+                                 m_income=session.get('m_income', {}),
+                                 expend_percent=session.get('expend_percent', 0),
+                                 income_percent=session.get('income_percent', 0),
+                                 pie_data=billdatabase.get_expend_classification_pie_data(session['user_id']),
+                                 bar_data=billdatabase.get_last_week_expend_bar_data(session['user_id']),
+                                 highest_lowest_expend=billdatabase.get_highest_lowest_week_expend_income(session['user_id']),
+                                 top10_expend=billdatabase.get_top10_expend_bill(session['user_id']),
+                                 last_two_weeks_expend=billdatabase.get_last_two_week_expend(session['user_id']))
 
 # 账单明细
 @app.route('/details', methods=['GET'])
