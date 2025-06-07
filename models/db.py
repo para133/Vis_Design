@@ -279,6 +279,42 @@ class BillDataBase:
         else:
             return "0.00"
         
+    def get_highest_expend_bill(self, user_id):
+        """
+        获取最高支出账单
+        """
+        bill = Bill.query.filter_by(user_id=user_id, income_or_expense='支出').order_by(Bill.amount.desc()).first()
+        if bill:
+            return {
+                "商品名称": bill.product or "",
+                "交易金额": f"{bill.amount:.2f}",
+                "对方名称": bill.counterparty or "",
+            }
+        else:
+            return {
+                "商品名称": "",
+                "交易金额": "0.00",
+                "对方名称": "",
+            }
+            
+    def get_highest_income_bill(self, user_id):
+        """
+        获取最高收入账单
+        """
+        bill = Bill.query.filter_by(user_id=user_id, income_or_expense='收入').order_by(Bill.amount.desc()).first()
+        if bill:
+            return {
+                "商品名称": bill.product or "",
+                "交易金额": f"{bill.amount:.2f}",
+                "对方名称": bill.counterparty or "",
+            }
+        else:
+            return {
+                "商品名称": "",
+                "交易金额": "0.00",
+                "对方名称": "",
+            }
+            
     def get_highest_income(self, user_id, start_date=None, end_date=None):
         """
         获取最高收入数值（保留2位小数，字符串类型）
@@ -380,3 +416,5 @@ class BillDataBase:
                 "支付方式": bill.payment_method or "",              
             })
         return top10
+    
+    

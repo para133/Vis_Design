@@ -34,8 +34,8 @@ def refresh_user_data(user_id):
     # 查询数据库
     total_expend = billdatabase.get_total_expend(user_id)
     total_income = billdatabase.get_total_income(user_id)
-    m_expend = billdatabase.get_highest_expend(user_id)
-    m_income = billdatabase.get_highest_income(user_id)
+    m_expend = billdatabase.get_highest_expend_bill(user_id)
+    m_income = billdatabase.get_highest_income_bill(user_id)
     pie_data = billdatabase.get_expend_classification_pie_data(user_id)
     highest_lowest_expend = billdatabase.get_highest_lowest_week_expend_income(user_id)
     top10_expend = billdatabase.get_top10_expend_bill(user_id)
@@ -48,9 +48,9 @@ def refresh_user_data(user_id):
     session['expend_percent'] = 0
     session['income_percent'] = 0
     if float(total_expend) != 0:
-        session['expend_percent'] = float(m_expend) / float(total_expend) * 100
+        session['expend_percent'] = float(m_expend["交易金额"]) / float(total_expend) * 100
     if float(total_income) != 0:
-        session['income_percent'] = float(m_income) / float(total_income) * 100
+        session['income_percent'] = float(m_income["交易金额"]) / float(total_income) * 100
     session['pie_data'] = pie_data
     session['bar_data'] = billdatabase.get_last_week_expend_bar_data(user_id)
     session['highest_lowest_expend'] = highest_lowest_expend
@@ -75,8 +75,8 @@ def index():
         return render_template('index.html', username=user.username,
                                  total_expend=session.get('total_expend', 0),
                                  total_income=session.get('total_income', 0),
-                                 m_expend=session.get('m_expend', 0),
-                                 m_income=session.get('m_income', 0),
+                                 m_expend=session.get('m_expend', {}),
+                                 m_income=session.get('m_income', {}),
                                  expend_percent=session.get('expend_percent', 0),
                                  income_percent=session.get('income_percent', 0),
                                  pie_data=session.get('pie_data', []),
@@ -113,8 +113,8 @@ def upload():
     return render_template('index.html', username=get_username(),message=message, message_type=message_type,
                             total_expend=session.get('total_expend', 0),
                             total_income=session.get('total_income', 0),
-                            m_expend=session.get('m_expend', 0),
-                            m_income=session.get('m_income', 0),
+                            m_expend=session.get('m_expend', {}),
+                            m_income=session.get('m_income', {}),
                             expend_percent=session.get('expend_percent', 0),
                             income_percent=session.get('income_percent', 0),
                             pie_data=session.get('pie_data', []),

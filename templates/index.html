@@ -13,34 +13,33 @@
 			</div>
 		</header>
 
-
-
         <div class="content-page">
             <!-- Start content -->
             <div class="content">
                 <div class="am-g">
                     <!-- 总支出 -->
-                    <div class="am-u-md-3">
-                        <div class="card-box" style="height: 180px;">
-                            <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">总支出</h4>
-                            <div class="widget-chart-1 am-cf">
-                                <div id="widget-chart-box-1" style="height: 110px;width: 110px;float: left;">
-                                </div>
-                                <div class="widget-detail-1" style="float: right;">
-                                    <h1 class="p-t-10 m-b-0" style="font-size: 28px;"> {{ total_expend }} </h1>
-                                    <p class="text-muted" style="font-size: 16px;">总支出金额</p>
-                                </div>
-                            </div>
+                    <div class="am-u-md-2">
+                    <div class="card-box" style="height: 180px;">
+                        <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">总支出</h4>
+                        <div class="widget-chart-1 am-cf" style="display: flex; align-items: center;">
+                        <div id="widget-chart-box-1" style="height: 110px;width: 110px; margin-right: 10px;">
+                        </div>
+                        <div class="widget-detail-1" style="flex: 1;">
+                            <h1 class="m-b-0" style="font-size: 28px;">{{ total_expend }}</h1>
+                            <p class="text-muted" style="font-size: 16px;">总支出金额</p>
+                        </div>
                         </div>
                     </div>
+                    </div>
+
                     <!-- 单笔最高支出 -->
-                    <div class="am-u-md-3">
+                    <div class="am-u-md-2">
                         <div class="card-box" style="height: 180px;">
                             <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">单笔最高支出</h4>
                             <div class="widget-box-2">
                                 <div class="widget-detail-2">
                                     <span class="badge pull-left m-t-20 am-round" style="color: #fff; background: #0e90d2;">{{ zcyl_dbzgzcbfb }} <i class="zmdi zmdi-trending-up"></i></span>
-                                    <h1 class="m-b-0" style="font-size: 28px;"> {{ m_expend }} </h1>
+                                    <h1 class="m-b-0" style="font-size: 28px;"> {{ m_expend.交易金额 }} </h1>
                                 </div>
                                 <div class="am-progress am-progress-xs am-margin-bottom-0">
                                     <div class="am-progress-bar" style="width: {{ expend_percent }}%"></div>
@@ -48,28 +47,30 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- 总收入 -->
-                    <div class="am-u-md-3">
-                        <div class="card-box" style="height: 180px;">
-                            <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">总收入</h4>
-                            <div class="widget-chart-1 am-cf">
-                                <div id="widget-chart-box-2" style="height: 110px;width: 110px;float: left;">
-                                </div>
-                                <div class="widget-detail-1" style="float: right;">
-                                    <h1 class="p-t-10 m-b-0" style="font-size: 28px;"> {{ total_income }} </h1>
-                                    <p class="text-muted" style="font-size: 16px;">总收入金额</p>
-                                </div>
-                            </div>
+                    <div class="am-u-md-2">
+                    <div class="card-box" style="height: 180px;">
+                        <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">总收入</h4>
+                        <div class="widget-chart-1 am-cf" style="display: flex; align-items: center;">
+                        <div id="widget-chart-box-2" style="height: 110px;width: 110px; margin-right: 10px;">
+                        </div>
+                        <div class="widget-detail-1" style="flex: 1;">
+                            <h1 class="m-b-0" style="font-size: 28px;">{{ total_income }}</h1>
+                            <p class="text-muted" style="font-size: 16px;">总收入金额</p>
+                        </div>
                         </div>
                     </div>
+                    </div>
+
                     <!-- 单笔最高收入 -->
-                    <div class="am-u-md-3">
+                    <div class="am-u-md-2">
                         <div class="card-box" style="height: 180px;">
                             <h4 class="header-title m-t-0 m-b-30" style="font-size: 18px;">单笔最高收入</h4>
                             <div class="widget-box-2">
                                 <div class="widget-detail-2">
                                     <span class="badge pull-left m-t-20 am-round progress-bar-pink" style="color: #fff;">{{ zcyl_dbzgsrbfb }} <i class="zmdi zmdi-trending-up"></i></span>
-                                    <h1 class="m-b-0" style="font-size: 28px;"> {{ m_income }} </h1>
+                                    <h1 class="m-b-0" style="font-size: 28px;"> {{ m_income.交易金额 }} </h1>
                                 </div>
                                 <div class="am-progress am-progress-xs am-margin-bottom-0" style="background: rgba(255, 138, 204, 0.2);">
                                     <div class="am-progress-bar progress-bar-pink" style="width: {{ income_percent }}%"></div>
@@ -77,7 +78,34 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Row end -->
+
+                    <!-- 右侧新栏 (上下两个卡片) -->
+                    <div class="am-u-md-4">
+                        <!-- 最高支出账单详情 -->
+                        <div class="card-box" style="height: 85px; margin-bottom: 10px;">
+                            <p>
+                            <strong>笨蛋！</strong>你居然为了 
+                            <span style="color: #1eb3e9e9; font-weight: bold"> {{ m_expend.商品名称 }} </span> 
+                            <span >付了</span>
+                            <span style="color: #3f51b5; text-decoration: underline"> {{ m_expend.对方名称 }} </span> 
+                            <span style="color: #bd1229; font-size: 1.1em"><strong> {{ m_expend.交易金额 }}元💸 </strong></span> 
+                            <span style="font-size: 0.8em"><strong>略略略～</strong></span>
+                            </p>
+                        </div>
+                        <!-- 最高收入账单详情 -->
+                        <div class="card-box" style="height: 85px;">
+                            <p>
+                            <strong>嘻嘻~</strong>
+                            </strong>你这<strong>杂鱼</strong>通过
+                            <span style="color: #1eb3e9e9; font-weight: bold"> {{ m_income.商品名称 }} </span>
+                            <span>从</span>
+                            <span style="color: #3f51b5; text-decoration: underline"> {{ m_income.对方名称 }} </span> 
+                            <span>抠到</span>
+                            <span style="color: #bd1229; font-weight: 800; text-shadow: 0 0 2px pink"> {{ m_income.交易金额 }}元💰</span> 
+                            <strong>，哼！</strong>
+                            </p>
+                        </div>
+                    </div>
                 </div>
 				
 				<div class="am-g">
