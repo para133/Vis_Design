@@ -35,14 +35,130 @@
 
 				<!-- start row1 -->
 				<div class="am-g">
-
-					<!--热力图-->
-					<div class="am-u-md-6" >
-						<!-- 折线图堆叠 -->
+					<div id="last20_weeks_expend_income_data" data-json='{{ last20_weeks_expend_income|tojson }}'></div>
+					<div class="am-u-md-6">
+						<!-- 收支热力图 -->
 						<div class="card-box">
-							<div  id="columnar1" style="width: 100%;height: 400px;"></div>
+							<div id="columnar1" style="width: 100%; height: 400px;"></div>
 						</div>
+						<script>
+						var incomeData = JSON.parse(document.getElementById("last20_weeks_expend_income_data").getAttribute("data-json"));
+
+						// 周一的日期，按周序整理，直接用完整的年月日
+						var weeks = [];
+						for (var i = 1; i <= 20; i++) {
+							var mondayItem = incomeData.find(item => item["周序"] === i && item["星期"] === "周一");
+							if (mondayItem) {
+								weeks.push(mondayItem["日期"]);  // 完整的年月日格式："2024-06-01"
+							}
+						}
+						var weekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+
+						// 每4周显示一次
+						var axisLabelFormatter = function(value, index) {
+							return (index % 4 === 0) ? value.substring(5) : '';  // x轴显示月日，保留美观
+						};
+
+						// 构造热力图数据
+						var heatmapData = incomeData.map(function(item) {
+							return [item["周序"] - 1, weekDays.indexOf(item["星期"]), item["收支"]];
+						});
+
+						// 动态确定最大绝对值，使用90%分位数
+						var allValues = incomeData.map(item => Math.abs(item["收支"])).sort((a,b)=>a-b);
+						var p90Index = Math.floor(allValues.length * 0.9);
+						var visualMax = allValues[p90Index];
+
+						// 初始化图表
+						var columnar1 = echarts.init(document.getElementById("columnar1"));
+						var option = {
+							title: {
+								text: '最近20周每日收支分布',
+								left: 'left'
+							},
+							tooltip: {
+								formatter: function (params) {
+									var value = params.value[2];
+									var type = (value < 0) ? '支出' : '收入';
+									var absValue = Math.abs(value).toFixed(2);
+									var weekIndex = params.value[0];
+									var weekLabel = '第' + (weekIndex + 1) + '周';
+									var dateLabel = weeks[weekIndex];
+									return weekLabel + '（' + dateLabel + '）<br/>' +
+										type + ' ' + absValue + ' 元';
+								}
+							},
+							grid: {
+								top: 75,
+								bottom: 25,
+								left: 30,
+								right: 30,
+								containLabel: true
+							},
+							xAxis: {
+								type: 'category',
+								data: weeks,
+								axisLabel: {
+									formatter: axisLabelFormatter
+								},
+								axisTick: { show: false },
+								axisLine: { show: true },
+								splitArea: { show: true },
+								name: '',
+							},
+							yAxis: {
+								type: 'category',
+								data: weekDays,
+								axisTick: { show: false },
+								axisLine: { show: true },
+								splitArea: { show: true },
+								name: '',
+							},
+							visualMap: {
+								min: -visualMax,
+								max: visualMax,
+								calculable: true,
+								orient: 'horizontal',
+								right: 0,
+								top: '0%',
+								inRange: {
+									color: ['#00bcd4', '#ff5722']
+								},
+								formatter: function(value) {
+									if (value < 0) {
+										return '支出 ' + Math.abs(Math.round(value)) + ' 元';
+									} else if (value > 0) {
+										return '收入 ' + Math.round(value)+ ' 元';
+									} else {
+										return '0';
+									}
+								}
+							},
+							series: [{
+								name: '收支',
+								type: 'heatmap',
+								data: heatmapData,
+								label: {
+									show: true,
+									color: '#000'
+								},
+								itemStyle: {
+									borderWidth: 4,
+									borderColor: '#fff',
+									borderRadius: 4
+								},
+								emphasis: {
+									itemStyle: {
+										shadowBlur: 10,
+										shadowColor: 'rgba(0, 0, 0, 0.5)'
+									}
+								}
+							}]
+						};
+						columnar1.setOption(option);
+						</script>
 					</div>
+
 					
 					<!-- 堆叠区域图  -->
 					<div class="am-u-md-6">
@@ -62,6 +178,18 @@
 							var categoriesSet = new Set(expendData.map(item => item["分类"]));
 							var categories = Array.from(categoriesSet);
 
+							// 统计每个分类的总金额
+							var categoryTotal = {};
+							expendData.forEach(function(item) {
+								var cat = item["分类"];
+								categoryTotal[cat] = (categoryTotal[cat] || 0) + item["金额"];
+							});
+
+							// 按总金额升序排序，最少的类在最上方，最多的类在最下方
+							categories.sort(function(a, b) {
+								return categoryTotal[a] - categoryTotal[b];
+							});
+
 							// 生成每个分类对应的每月金额（如果没有则补0）
 							var categoryDataMap = {};
 							categories.forEach(function(cat) {
@@ -71,8 +199,18 @@
 								});
 							});
 
-							// 构造 series 数据
-							var seriesData = categories.map(function(cat) {
+							// 生成颜色数组（可根据分类数扩展）
+							var colorList = [
+								'#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3',
+								'#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd'
+							];
+							// 若分类数超出颜色数，循环使用
+							var barColors = categories.map(function(_, idx) {
+								return colorList[idx % colorList.length];
+							});
+
+							// 构造 series 数据，并指定每个分类的颜色
+							var seriesData = categories.map(function(cat, idx) {
 								return {
 									name: cat,
 									type: 'bar',
@@ -80,6 +218,9 @@
 									label: {
 										show: true,
 										position: 'insideRight'
+									},
+									itemStyle: {
+										color: barColors[idx]
 									},
 									data: categoryDataMap[cat]
 								};
@@ -190,9 +331,75 @@
 
 					
 					<div class="am-u-md-6">
-						<!-- 大数据面积图  -->
+						<!-- 全年收支记录  -->
+						 <div id="all_year_monthly_expend_income_data" data-json='{{ all_year_monthly_expend_income|tojson }}'></div>
 						<div class="card-box">
 							<div  id="columnar4" style="width: 100%;height: 400px;"></div>
+							<script>
+								// 解析后端传来的数据
+								var incomeData = JSON.parse(document.getElementById("all_year_monthly_expend_income_data").getAttribute("data-json"));
+
+								// 提取月份、收入和支出数据
+								var months = incomeData.map(item => item["月份"]);
+								var incomes = incomeData.map(item => item["收入"]);
+								var expenses = incomeData.map(item => item["支出"]);
+
+								// 初始化图表
+								var columnar4 = echarts.init(document.getElementById("columnar4"));
+
+								var option = {
+									title: {
+										text: '最近一年每月收支情况',
+										x: 'left'
+									},
+									tooltip: {
+										trigger: 'axis',
+										axisPointer: { type: 'shadow' },
+										formatter: function(params) {
+											var month = params[0].name;
+											var income = params.find(p => p.seriesName === '收入')?.data || 0;
+											var expense = params.find(p => p.seriesName === '支出')?.data || 0;
+											return month + '<br/>收入: ' + income.toFixed(2) + ' 元<br/>支出: ' + expense.toFixed(2) + ' 元';
+										}
+									},
+									legend: {
+										data: ['收入', '支出'],
+										top: '10%'
+									},
+									grid: {
+										top: 80,
+										left: 50,
+										right: 30,
+										bottom: 50,
+										containLabel: true
+									},
+									xAxis: {
+										type: 'category',
+										data: months,
+										axisTick: { alignWithLabel: true }
+									},
+									yAxis: {
+										type: 'value'
+									},
+									series: [
+										{
+											name: '收入',
+											type: 'bar',
+											data: incomes,
+											itemStyle: { color: '#4caf50' } // 绿色
+										},
+										{
+											name: '支出',
+											type: 'bar',
+											data: expenses,
+											itemStyle: { color: '#f44336' } // 红色
+										}
+									]
+								};
+
+								columnar4.setOption(option);
+							</script>
+
 						</div>
 					</div>
 
