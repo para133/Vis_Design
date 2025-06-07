@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -403,6 +404,7 @@ class BillDataBase:
             "highest": {"week_start": highest_week, "days": round_dict(week_map[highest_week])},
             "lowest": {"week_start": lowest_week, "days": round_dict(week_map[lowest_week])}
         }  
+        
     def get_top10_expend_bill(self, user_id):
         """
         获取支出金额前10的账单
@@ -545,32 +547,47 @@ class BillDataBase:
     
     def get_all_year_monthly_expend_income(self, user_id):
         """
-        获取最近一年的每月收支数据
+        获取最近一年的每月收支数据：
+        从上个月往前推11个月，共12个月
         """
         today = datetime.now()
-        one_year_ago = today - timedelta(days=365)
-        
-        bills = self.get_bills(user_id, start_date=one_year_ago, end_date=today)
-        month_data = {}
+        # 获取上个月的最后一天
+        first_day_this_month = today.replace(day=1)
+        last_month_end = first_day_this_month - timedelta(days=1)
 
+        # 获取12个月的起始时间
+        start_date = (last_month_end.replace(day=1) - relativedelta(months=11))
+        end_date = last_month_end.replace(hour=23, minute=59, second=59)
+
+        # 获取账单
+        bills = self.get_bills(user_id, start_date=start_date, end_date=end_date)
+
+        # 初始化12个月份
+        month_data = {}
+        for i in range(12):
+            month = (start_date + relativedelta(months=i)).strftime("%Y-%m")
+            month_data[month] = {"收入": 0.0, "支出": 0.0}
+
+        # 填充账单数据
         for bill in bills:
             month = bill.transaction_time.strftime("%Y-%m")
-            if month not in month_data:
-                month_data[month] = {"收入": 0.0, "支出": 0.0}
-            if hasattr(bill, "income_or_expense"):
-                if bill.income_or_expense == "支出":
-                    month_data[month]["支出"] += float(bill.amount)
-                elif bill.income_or_expense == "收入":
-                    month_data[month]["收入"] += float(bill.amount)
+            if month in month_data:
+                if hasattr(bill, "income_or_expense"):
+                    if bill.income_or_expense == "支出":
+                        month_data[month]["支出"] += float(bill.amount)
+                    elif bill.income_or_expense == "收入":
+                        month_data[month]["收入"] += float(bill.amount)
 
-        # 计算每月净收入
+        # 整理结果
         result = []
-        for month, data in sorted(month_data.items()):
+        for month in sorted(month_data.keys()):
+            data = month_data[month]
             result.append({
                 "月份": month,
                 "收入": round(data["收入"], 2),
                 "支出": round(data["支出"], 2),
             })
+
         return result
     
     def get_sankey_data(self, user_id):
