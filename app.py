@@ -1,9 +1,7 @@
 import os
 from datetime import datetime
 
-from flask import Flask, request, jsonify, render_template,redirect, url_for,session
-from pyecharts.charts import Bar
-from pyecharts import options as opts
+from flask import Flask, request, render_template,redirect, url_for,session
 
 from models.data import db
 from models.db import BillDataBase
@@ -40,6 +38,7 @@ def refresh_user_data(user_id):
     highest_lowest_expend = billdatabase.get_highest_lowest_week_expend_income(user_id)
     top10_expend = billdatabase.get_top10_expend_bill(user_id)
     last_two_weeks_expend = billdatabase.get_last_two_week_expend(user_id)
+    last_half_year_expend = billdatabase.get_last_half_year_expend(user_id)
     # 存到 session
     session['total_expend'] = total_expend
     session['total_income'] = total_income
@@ -56,8 +55,7 @@ def refresh_user_data(user_id):
     session['highest_lowest_expend'] = highest_lowest_expend
     session['top10_expend'] = top10_expend
     session['last_two_weeks_expend'] = last_two_weeks_expend
-    
-    
+    session['last_half_year_expend'] = last_half_year_expend
     
 # 首页路由
 @app.route('/')
@@ -175,6 +173,15 @@ def login():
                 return render_template('login.html', message=f"新用户 {username} 已创建，请重新登录")
             
     return render_template('login.html')
+
+@app.route("/expend_income", methods=['GET'])
+def chart_columnar():
+    '''
+    消费支收图
+    '''
+    last_half_year_expend = session.get('last_half_year_expend', [])
+    return render_template('expend_income.html',
+                           last_half_year_expend=last_half_year_expend,)
 
 @app.route('/logout')
 def logout():

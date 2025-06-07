@@ -170,11 +170,9 @@
                     <!-- 消费分类 -->
 					<div class="am-u-md-4">
 						<div class="card-box">
-							<h4 class="header-title m-t-0">消费分类</h4>
-
                             <!-- 消费分类饼图 input: pie_data [{'value':v,'name':k},...] -->
+							<h4 class="header-title m-t-0">消费分类</h4>
 							<div id="index-pie-1" style="height: 345px;"></div>
-  
                             <div id="pie_data" data-json='{{ pie_data|tojson }}'></div>
                             <div>
                                 <script>
@@ -273,9 +271,8 @@
 
                     <!-- 近一周消费 -->
                     <div class="am-u-md-4">
-                        <div class="card-box">
+                        <div class="card-box">                            
                             <h4 class="header-title m-t-0">近一周消费</h4>
-                            <!-- 近一周消费柱状图 -->
                             <div id="index-bar-1" style="height: 345px;"></div>
 
                             <!-- 用于存储 bar_data -->
@@ -352,10 +349,7 @@
                     <div class="am-u-md-4">
                         <div class="card-box">
                             <h4 class="header-title m-t-0">两周高低消费对比</h4>
-                            <!-- 两周高低消费对比折线图 -->
                             <div id="index-line-1" style="height: 345px;"></div>
-
-                            <!-- 在这里放 hidden div 用于传递 JSON 数据 -->
                             <div id="highest_lowest_expend" data-json='{{ highest_lowest_expend|tojson }}'></div>
 
                             <div>
@@ -511,6 +505,22 @@
                                                     '<br/>消费金额: ' + amountText;
                                             }
                                         },
+                                        visualMap: {
+                                            min: 0,
+                                            max: maxAmount,
+                                            dimension: 1, // 以 y 值为维度
+                                            inRange: {
+                                                color: ['#00bcd4', '#ff5722'] // 从下到上：蓝色 → 橙色
+                                            },
+                                            calculable: false, // 关闭交互（可拖动选择范围）
+                                            orient: 'horizontal', // 横向放置
+                                            right: 10, // 右上角
+                                            top: 0, // 放在顶部
+                                            top: 'end', // 放在顶部
+                                            text: ['高金额', '低金额'], // 文本标注
+                                            itemHeight: 100, // 横向长度
+                                            itemWidth: 10 // 竖向厚度（减小）
+                                        },
                                         xAxis: {
                                             type: 'category',
                                             name: '消费时间',
@@ -542,10 +552,7 @@
                                         series: [{
                                             symbolSize: 10,
                                             data: dataPoints,
-                                            type: 'scatter',
-                                            itemStyle: {
-                                                color: '#ff5722'
-                                            }
+                                            type: 'scatter'
                                         }]
                                     };
 
@@ -557,10 +564,10 @@
                                         myChart.resize();
                                     });
                                     </script>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- 近两周消费分布卡片 -->
+						<!-- col end -->
 
                     <!-- 消费清单部分 -->
                     <div class="am-u-md-8">
