@@ -56,7 +56,24 @@ def refresh_user_data(user_id):
     session['top10_expend'] = top10_expend
     session['last_two_weeks_expend'] = last_two_weeks_expend
     session['last_half_year_expend'] = last_half_year_expend
+def get_sankey_data():
+    return billdatabase.get_sankey_data(session['user_id'])
+
+@app.route("/expend_income", methods=['GET'])
+
+def chart_columnar():
+    '''
+    消费支收图
+    '''
+    sankey_data = billdatabase.get_sankey_data(session['user_id'])
+    print(sankey_data)
     
+    return render_template('expend_income.html',username=get_username(),
+                           last_half_year_expend=session.get('last_half_year_expend', []),
+                           sankey_data=get_sankey_data())
+
+
+
 # 首页路由
 @app.route('/')
 def index():
@@ -174,14 +191,7 @@ def login():
             
     return render_template('login.html')
 
-@app.route("/expend_income", methods=['GET'])
-def chart_columnar():
-    '''
-    消费支收图
-    '''
-    last_half_year_expend = session.get('last_half_year_expend', [])
-    return render_template('expend_income.html',username=get_username(),
-                           last_half_year_expend=last_half_year_expend,)
+
 
 @app.route('/logout')
 def logout():
