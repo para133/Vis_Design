@@ -48,18 +48,20 @@
                                     var summaryDiv = document.getElementById('ai-summary');
                                     summaryDiv.innerText = '';
                                     var markdownContent = '';
+                                    var processedContent = '';
      
                                     function fixMarkdown(md) {
-                                        // 1. 标题（#、##、###等）前后加换行，只处理行首的#
+                                        // 1. 标题（#、##、###等）
                                         md = md.replace(/(#+)([^\s#])/g, '$1 $2'); // #后补空格
                                         md = md.replace(/(#+ .+?)(?=(#+|$))/g, '\n$1\n'); // 标题前后加换行
 
-                                        // 2. 有序列表项（如1. 2. 3.）前加换行，避免数字被误拆，要求数字后有点和空格
+                                        // 2. 有序列表项（如1. 2. 3.）
                                         md = md.replace(/(\d+\.\s)/g, '\n$1');
 
                                         // 3. 无序列表项（- 或 *）前加换行
                                         md = md.replace(/([^\n])(- |\* )/g, '$1\n$2');
-
+                                        //行首的-后面加空格
+                                        md = md.replace(/^-(?! )/gm, '- ');
                                         // 4. 分隔线 --- 前后加换行
                                         md = md.replace(/([^\n])---/g, '$1\n---');
                                         md = md.replace(/---([^\n])/g, '---\n$1');
@@ -76,24 +78,25 @@
 
                                     var es = new EventSource('/api/ai_summary_stream');
                                     es.onmessage = function(e) {
-
+                                        
                                         markdownContent += e.data;
-                                        // console.log('Origin:', markdownContent);
-                                        markdownContent = fixMarkdown(markdownContent); // 修复Markdown格式
-                                        // console.log('Received data:', markdownContent);
-                                        summaryDiv.innerHTML = marked.parse(markdownContent, { 
+                                        processedContent += e.data;
+                                        processedContent = fixMarkdown(processedContent); 
+
+                                        summaryDiv.innerHTML = marked.parse(processedContent, { 
                                                                         pedantic: false,
                                                                         gfm: true, 
                                                                         breaks: true,
                                                                         smartLists: true,
                                                                         xhtml: true,}); 
-                                        // console.log('Updated summary content:', summaryDiv.innerHTML);
                                     
                                     };
                                     es.onerror = function() {
                                         es.close();
                                         btn.disabled = false;
                                         btn.innerText = '生成AI总结';
+                                        console.log('Origin:\n',markdownContent)
+                                        console.log('Processed:\n', processedContent);
                                     };
                                 };
                             </script>

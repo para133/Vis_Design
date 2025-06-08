@@ -6,7 +6,7 @@ from flask import Flask, request, render_template,redirect, url_for,session, jso
 from models.data import db
 from models.db import BillDataBase
 from utils import AIClient
-import markdown
+
 
 app = Flask(__name__)
 app.secret_key = 'jasd0isdoashdfaun0*@#&B*Babi9aubd'  
