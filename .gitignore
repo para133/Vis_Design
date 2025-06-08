@@ -3,3 +3,5 @@
 /uploads/*
 /__pycache__
 /*/__pycache__
+/utils.py
+/templates/report.html
