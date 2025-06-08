@@ -48,7 +48,7 @@
                                     var summaryDiv = document.getElementById('ai-summary');
                                     summaryDiv.innerText = '';
                                     var markdownContent = '';
-                                    var origindata = '';
+                                    var processedContent = '';
      
                                     function fixMarkdown(md) {
                                         // 删除所有流式数据自带的换行
@@ -65,7 +65,8 @@
 
                                         // 3. 无序列表项（- 或 *）前加换行
                                         md = md.replace(/([^\n])(- |\* )/g, '$1\n$2');
-
+                                        //行首的-后面加空格
+                                        md = md.replace(/^-(?! )/gm, '- ');
                                         // 4. 分隔线 --- 前后加换行
                                         md = md.replace(/([^\n])---/g, '$1\n---');
                                         md = md.replace(/---([^\n])/g, '---\n$1');
@@ -85,24 +86,25 @@
 
                                     var es = new EventSource('/api/ai_summary_stream');
                                     es.onmessage = function(e) {
-                                        origindata += e.data;
+                                        
                                         markdownContent += e.data;
-                                        console.log('Origin:', origindata);
-                                        markdownContent = fixMarkdown(markdownContent); // 修复Markdown格式
-                                        console.log('Received data:', markdownContent);
-                                        summaryDiv.innerHTML = marked.parse(markdownContent, { 
+                                        processedContent += e.data;
+                                        processedContent = fixMarkdown(processedContent); 
+
+                                        summaryDiv.innerHTML = marked.parse(processedContent, { 
                                                                         pedantic: false,
                                                                         gfm: true, 
                                                                         breaks: true,
                                                                         smartLists: true,
                                                                         xhtml: true,}); 
-                                        console.log('Updated summary content:', summaryDiv.innerHTML);
                                     
                                     };
                                     es.onerror = function() {
                                         es.close();
                                         btn.disabled = false;
                                         btn.innerText = '生成AI总结';
+                                        console.log('Origin:\n',markdownContent)
+                                        console.log('Processed:\n', processedContent);
                                     };
                                 };
                             </script>

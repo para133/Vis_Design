@@ -1,5 +1,5 @@
 flask
-pandas
 matplotlib
 openpyxl
 flask-sqlalchemy
+openai
